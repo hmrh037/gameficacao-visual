@@ -1,0 +1,72 @@
+==================================================================
+  COMO CONECTAR AS TVs NA BASE (pela internet) - CAR/Gameficacao
+==================================================================
+
+O sistema tem 3 arquivos que ficam JUNTOS na mesma pasta:
+  - base.html            -> onde voce alimenta os dados (lanca matriculas)
+  - tv.html              -> o painel que roda em cada TV
+  - firebase-config.js   -> a "chave" de conexao (voce preenche uma vez)
+  - exemplo.webp         -> a imagem do escudo
+
+Para as TVs em locais diferentes conversarem pela internet, usamos o
+FIREBASE (Google) - e GRATIS. Siga os passos (uma unica vez):
+
+------------------------------------------------------------------
+PASSO 1 - Criar o projeto (5 minutos)
+------------------------------------------------------------------
+1. Acesse:  https://console.firebase.google.com
+2. Entre com uma conta Google e clique em "Adicionar projeto".
+3. De um nome (ex.: gameficacao-visual) e avance ate criar.
+
+------------------------------------------------------------------
+PASSO 2 - Criar o banco de dados (Realtime Database)
+------------------------------------------------------------------
+1. No menu da esquerda: Criacao > Realtime Database.
+2. Clique em "Criar banco de dados".
+3. Escolha o local (pode deixar o padrao) e em regras escolha
+   "Iniciar em modo de teste" (libera leitura/escrita por 30 dias).
+4. Depois de criado, copie a URL do banco (algo como:
+   https://SEU-PROJETO-default-rtdb.firebaseio.com )
+
+------------------------------------------------------------------
+PASSO 3 - Pegar as chaves do app web
+------------------------------------------------------------------
+1. Va em "Visao geral do projeto" (engrenagem) > Configuracoes do projeto.
+2. Em "Seus apps", clique no icone </> (Web) para registrar um app web.
+3. De um apelido qualquer e registre. Vai aparecer um bloco
+   firebaseConfig com: apiKey, authDomain, databaseURL, projectId, appId.
+
+------------------------------------------------------------------
+PASSO 4 - Colar no arquivo firebase-config.js
+------------------------------------------------------------------
+1. Abra o arquivo  firebase-config.js  (com o Bloco de Notas).
+2. Substitua os campos pelos valores do seu firebaseConfig.
+3. Salve.  (Esse mesmo arquivo serve para a base e para as TVs.)
+
+------------------------------------------------------------------
+PASSO 5 - Colocar os arquivos online (para as TVs acessarem)
+------------------------------------------------------------------
+Opcao A (mais simples) - servico gratuito de hospedagem:
+   - Crie conta em https://app.netlify.com  (ou GitHub Pages)
+   - Arraste a pasta inteira para o Netlify Drop (https://app.netlify.com/drop)
+   - Ele gera um link, por ex.:  https://seunome.netlify.app
+   - Na TV, abra:   https://seunome.netlify.app/tv.html
+   - Para lancar matriculas:   https://seunome.netlify.app/base.html
+
+Opcao B - testar no mesmo PC (sem hospedar):
+   - Abra base.html e tv.html no navegador (2 cliques).
+   - Funciona, desde que o firebase-config.js esteja preenchido e
+     o PC esteja com internet.
+
+------------------------------------------------------------------
+COMO USAR NO DIA A DIA
+------------------------------------------------------------------
+- Em cada TV: abra tv.html e clique em "INICIAR PAINEL" (ativa som/tela cheia).
+- No PC/celular do gestor: abra base.html, cadastre vendedores e equipes.
+- Quando alguem fizer uma matricula, clique no vendedor em
+  "Lancar Nova Matricula"  ->  TODAS as TVs comemoram na hora
+  (foto no escudo + baloes + confete + fanfarra).
+
+OBS: no "modo de teste" o banco fica aberto por 30 dias. Quando quiser,
+me chame que ajustamos as regras de seguranca para uso permanente.
+==================================================================

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>BASE — Controle de Vendas (Grupo Visual)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,Arial,sans-serif;}
+  :root{--bg:#0b1020;--bg2:#141b33;--card:#1a2342;--border:#2a3658;--text:#f1f5f9;--muted:#94a3b8;--gold:#fbbf24;--green:#22c55e;}
+  body{background:var(--bg);color:var(--text);min-height:100vh;padding:24px;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  h1{font-size:24px;font-weight:900;}h1 span{color:var(--gold);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ef4444;}.dot.on{background:var(--green);}
+  .hint{color:var(--muted);font-size:13px;margin-bottom:18px;}
+  .acard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px;}
+  .acard h2{font-size:16px;color:var(--gold);margin-bottom:12px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+  .fld{display:flex;flex-direction:column;gap:4px;}
+  .fld label{font-size:12px;color:var(--muted);}
+  input,select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;}
+  .btn{background:var(--gold);color:#1a1300;border:none;border-radius:8px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;}
+  .btn.sec{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .btn.red{background:#ef4444;color:#fff;}
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);font-size:14px;}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;}
+  .av{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);background:#0008;}
+  .chip{border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;}
+  .big-mat{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px;}
+  .vbtn{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text);cursor:pointer;}
+  .vbtn img{width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid var(--border);background:#0008;}
+  .vbtn .vn{font-size:13px;font-weight:700;text-align:center;}
+  .vbtn:hover{border-color:var(--gold);}
+  #aviso{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:400;padding:6vw;text-align:center;}
+  #aviso .box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:600px;}
+  #aviso h2{color:var(--gold);margin-bottom:12px;}#aviso p{color:var(--muted);line-height:1.6;}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#06210f;padding:12px 24px;border-radius:999px;font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div id="aviso" class="hidden" style="display:none"><div class="box">
+  <h2>⚙️ Configure o Firebase</h2>
+  <p>Abra o arquivo <b>firebase-config.js</b> e cole as chaves do seu projeto Firebase.<br>O passo a passo está em <b>COMO-CONECTAR.txt</b>.</p>
+</div></div>
+
+<div class="wrap">
+  <div class="topbar">
+    <h1>🎛️ BASE — Controle de <span>Vendas</span></h1>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusTxt">conectando...</span></div>
+  </div>
+  <div class="hint">Tudo o que você cadastrar/lançar aqui aparece nas TVs em tempo real (elas abrem o arquivo <b>tv.html</b>).</div>
+
+  <div class="acard">
+    <h2>🚀 Lançar Nova Matrícula</h2>
+    <div class="hint">Clique no vendedor que fez a venda — todas as TVs comemoram na hora.</div>
+    <div class="big-mat" id="botoesMat"></div>
+  </div>
+
+  <div class="acard">
+    <h2>⚙️ Configurações</h2>
+    <div class="row">
+      <div class="fld"><label>Tempo da comemoração (segundos)</label><input id="cfgTempo" type="number" min="2" max="60" step="1" onchange="setTempoCeleb(this.value)"/></div>
+      <div class="fld"><label>Valor da matrícula (R$)</label><input id="cfgValor" type="number" min="0" step="0.01" placeholder="0,00" onchange="setValorMat(this.value)"/></div>
+      <div class="fld"><label>Alerta de inatividade (minutos)</label><input id="cfgInativ" type="number" min="0" max="240" step="1" placeholder="0 = desligado" onchange="setInatividade(this.value)"/></div>
+    </div>
+    <div class="hint" style="margin-top:6px">Tempo da comemoração nas TVs · Valor padrão somado a cada matrícula lançada · Inatividade: após X minutos sem vendas, as TVs tocam o 🦗 grilo (0 desliga).</div>
+  </div>
+
+  <div class="acard">
+    <h2>👥 Equipes</h2>
+    <div id="equipesAdmin"></div>
+  </div>
+
+  <div class="acard">
+    <h2>🧑‍💼 Vendedores</h2>
+    <div class="row" style="margin-bottom:12px">
+      <div class="fld"><label>Nome</label><input id="vNome" placeholder="Nome do vendedor"/></div>
+      <div class="fld"><label>Equipe</label><select id="vEquipe"></select></div>
+      <div class="fld"><label>Foto</label><input id="vFoto" type="file" accept="image/*"/></div>
+      <button class="btn" onclick="addVendedor()">+ Adicionar</button>
+    </div>
+    <table><thead><tr><th>Foto</th><th>Nome</th><th>Equipe</th><th>Matrículas</th><th></th></tr></thead><tbody id="tabVend"></tbody></table>
+  </div>
+
+  <div class="acard">
+    <h2>🗑 Matrículas lançadas</h2>
+    <div id="listaMat" style="max-height:240px;overflow:auto"></div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn sec" onclick="testarUltra()">🏎️ Testar ultrapassagem nas TVs</button>
+      <button class="btn sec" onclick="tocarGrilo()">🦗 Tocar grilo nas TVs</button>
+      <button class="btn red" onclick="zerarMatriculas()">Zerar todas as matrículas</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const uid=()=>Date.now()+Math.floor(Math.random()*100000);
+let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
+let vendedores=[],matriculas=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0};
+let db=null,pronto=false;
+function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarEstado();}
+function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarEstado();}
+function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarEstado();}
+
+function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
+function conectar(){
+  if(!cfgValida()){document.getElementById('aviso').style.display='flex';return;}
+  firebase.initializeApp(window.FIREBASE_CONFIG);db=firebase.database();
+  firebase.database().ref('.info/connected').on('value',s=>setStatus(!!s.val()));
+  db.ref('painel/estado').on('value',snap=>{
+    const d=snap.val();
+    if(d){equipes=d.equipes||equipes;vendedores=d.vendedores||[];matriculas=d.matriculas||[];if(d.config)config={...config,...d.config};}
+    else{ salvarEstado(); } // primeira vez: cria estado inicial
+    pronto=true;renderAdmin();
+  });
+}
+function setStatus(on){document.getElementById('dot').classList.toggle('on',on);document.getElementById('statusTxt').textContent=on?'conectado — TVs recebendo':'sem conexão';}
+function salvarEstado(){ if(db) db.ref('painel/estado').set({equipes,vendedores,matriculas,config}); }
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
+
+const getEq=id=>equipes.find(e=>e.id===id);
+const getVend=id=>vendedores.find(v=>v.id===id);
+
+function renderAdmin(){
+  document.getElementById('vEquipe').innerHTML=equipes.map(e=>`<option value="${e.id}">${e.nome}</option>`).join('');
+  document.getElementById('equipesAdmin').innerHTML=equipes.map(e=>`
+    <div class="row" style="margin-bottom:8px">
+      <div class="fld"><label>Nome da equipe</label><input value="${(e.nome||'').replace(/"/g,'&quot;')}" onchange="editEquipe(${e.id},'nome',this.value)"/></div>
+      <div class="fld"><label>Cor</label><input type="color" value="${e.cor}" onchange="editEquipe(${e.id},'cor',this.value)" style="width:60px;height:40px;padding:2px"/></div>
+      <div class="fld"><label>Meta (matrículas)</label><input type="number" min="0" step="1" value="${e.meta||0}" onchange="editEquipe(${e.id},'meta',this.value)" style="width:120px"/></div>
+      <button class="btn red" onclick="delEquipe(${e.id})" title="Remover equipe">✕</button>
+    </div>`).join('')+`<button class="btn sec" onclick="addEquipe()" style="margin-top:4px">+ Adicionar equipe</button>`;
+  document.getElementById('botoesMat').innerHTML=vendedores.length?vendedores.map(v=>`
+    <button class="vbtn" onclick="lancarMatricula(${v.id})">
+      ${v.foto?`<img src="${v.foto}"/>`:`<div style="width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0008;font-size:26px">🧑‍💼</div>`}
+      <div class="vn">${v.nome}</div></button>`).join(''):'<div class="hint">Cadastre vendedores abaixo primeiro.</div>';
+  document.getElementById('tabVend').innerHTML=vendedores.map(v=>{const eq=getEq(v.equipeId)||{nome:'—',cor:'#888'};const qtd=matriculas.filter(m=>m.vendedorId===v.id).length;
+    return `<tr><td>${v.foto?`<img class="av" src="${v.foto}"/>`:'🧑‍💼'}</td><td>${v.nome}</td><td><span class="chip" style="background:${eq.cor}33;color:${eq.cor}">${eq.nome}</span></td><td>${qtd}</td>
+      <td><button class="btn sec" onclick="trocarFoto(${v.id})">📷</button> <button class="btn red" onclick="delVendedor(${v.id})">✕</button></td></tr>`;}).join('');
+  const ms=[...matriculas].sort((a,b)=>b.id-a.id).slice(0,40);
+  document.getElementById('listaMat').innerHTML=ms.length?ms.map(m=>{const v=getVend(m.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — ${new Date(m.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delMatricula(${m.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhuma matrícula lançada ainda.</div>';
+  const ct=document.getElementById('cfgTempo');if(ct)ct.value=config.tempoCeleb||8;
+  const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
+  const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
+}
+function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEstado();renderAdmin();}}
+const PALETA=["#2563eb","#ef4444","#22c55e","#a855f7","#f59e0b","#ec4899","#06b6d4","#84cc16"];
+function addEquipe(){const cor=PALETA[equipes.length%PALETA.length];equipes.push({id:uid(),nome:'Equipe '+(equipes.length+1),cor,meta:0});salvarEstado();renderAdmin();toast('Equipe adicionada');}
+function delEquipe(id){if(equipes.length<=1){alert('É preciso ter pelo menos uma equipe.');return;}const temVend=vendedores.some(v=>v.equipeId===id);if(temVend&&!confirm('Esta equipe tem vendedores. Remover mesmo assim? (os vendedores ficarão sem equipe)')) return;else if(!temVend&&!confirm('Remover esta equipe?'))return;equipes=equipes.filter(e=>e.id!==id);salvarEstado();renderAdmin();}
+function addVendedor(){
+  const nome=document.getElementById('vNome').value.trim();if(!nome){alert('Informe o nome.');return;}
+  const equipeId=Number(document.getElementById('vEquipe').value)||equipes[0].id;
+  const file=document.getElementById('vFoto').files[0];
+  const fin=foto=>{vendedores.push({id:uid(),nome,equipeId,foto:foto||''});salvarEstado();document.getElementById('vNome').value='';document.getElementById('vFoto').value='';renderAdmin();toast('Vendedor adicionado');};
+  if(file)comprimir(file,fin);else fin('');
+}
+function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vendedores.filter(v=>v.id!==id);salvarEstado();renderAdmin();}}
+function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarEstado();renderAdmin();toast('Foto atualizada');}});};inp.click();}
+function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const mx=400;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.8));};img.src=e.target.result;};r.readAsDataURL(file);}
+function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarEstado();renderAdmin();}
+function zerarMatriculas(){if(confirm('Apagar TODAS as matrículas?')){matriculas=[];salvarEstado();renderAdmin();}}
+function testarUltra(){
+  if(vendedores.length<2){alert('Cadastre pelo menos 2 vendedores para testar a ultrapassagem.');return;}
+  const cnt={};vendedores.forEach(v=>cnt[v.id]=0);matriculas.forEach(m=>{if(cnt[m.vendedorId]!=null)cnt[m.vendedorId]++;});
+  const ord=[...vendedores].sort((a,b)=>(cnt[b.id]||0)-(cnt[a.id]||0)).map(v=>v.id);
+  if(db) db.ref('painel/testeultra').set({xId:ord[1],yId:ord[0],ts:Date.now()});
+  toast('🏎️ Teste de ultrapassagem enviado às TVs');
+}
+function tocarGrilo(){if(db)db.ref('painel/grilo').set({ts:Date.now()});toast('🦗 Grilo enviado às TVs');}
+function lancarMatricula(vendedorId){
+  const m={id:uid(),vendedorId,valor:Number(config.valorMatricula)||0,data:(function(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})(),dt:Date.now()};
+  matriculas.push(m);salvarEstado();
+  if(db) db.ref('painel/celebra').set({vendedorId,ts:Date.now(),id:m.id}); // dispara comemoracao nas TVs
+  renderAdmin();
+  const v=getVend(vendedorId);toast('🎉 Matrícula lançada para '+(v?v.nome:''));
+}
+conectar();renderAdmin();
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Arquivos só de desenvolvimento/preview — não fazem parte do painel publicado
+.preview-server.js
+.claude/
