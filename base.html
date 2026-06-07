@@ -47,10 +47,21 @@
   <p>Abra o arquivo <b>firebase-config.js</b> e cole as chaves do seu projeto Firebase.<br>O passo a passo está em <b>COMO-CONECTAR.txt</b>.</p>
 </div></div>
 
-<div class="wrap">
+<div id="login" style="position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:500;padding:6vw;text-align:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:380px;width:100%">
+    <h2 style="color:var(--gold);margin-bottom:6px">🔐 Acesso do Gestor</h2>
+    <p class="hint" style="margin-bottom:18px">Entre para lançar e gerenciar as vendas.</p>
+    <div class="fld" style="margin-bottom:10px"><input id="loginEmail" type="email" placeholder="E-mail" style="width:100%" autocomplete="username"/></div>
+    <div class="fld" style="margin-bottom:14px"><input id="loginSenha" type="password" placeholder="Senha" style="width:100%" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()"/></div>
+    <button class="btn" style="width:100%" id="btnLogin" onclick="fazerLogin()">Entrar</button>
+    <div id="loginErro" style="color:#ef4444;font-size:13px;margin-top:10px;min-height:16px"></div>
+  </div>
+</div>
+
+<div class="wrap" style="display:none">
   <div class="topbar">
     <h1>🎛️ BASE — Controle de <span>Vendas</span></h1>
-    <div class="status"><span class="dot" id="dot"></span><span id="statusTxt">conectando...</span></div>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusTxt">conectando...</span><button class="btn sec" style="padding:4px 12px;margin-left:8px" onclick="sair()">Sair</button></div>
   </div>
   <div class="hint">Tudo o que você cadastrar/lançar aqui aparece nas TVs em tempo real (elas abrem o arquivo <b>tv.html</b>).</div>
 
@@ -100,6 +111,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
 const uid=()=>Date.now()+Math.floor(Math.random()*100000);
@@ -111,9 +123,29 @@ function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./
 function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarEstado();}
 
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
-function conectar(){
+// ---- autenticacao do gestor ----
+function iniciar(){
   if(!cfgValida()){document.getElementById('aviso').style.display='flex';return;}
-  firebase.initializeApp(window.FIREBASE_CONFIG);db=firebase.database();
+  if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+  firebase.auth().onAuthStateChanged(u=>{
+    if(u){ document.getElementById('login').style.display='none'; document.querySelector('.wrap').style.display='block'; conectar(); }
+    else { document.getElementById('login').style.display='flex'; document.querySelector('.wrap').style.display='none'; }
+  });
+}
+function fazerLogin(){
+  const email=(document.getElementById('loginEmail').value||'').trim();
+  const senha=document.getElementById('loginSenha').value||'';
+  const err=document.getElementById('loginErro');err.textContent='';
+  const btn=document.getElementById('btnLogin');btn.disabled=true;btn.textContent='Entrando...';
+  firebase.auth().signInWithEmailAndPassword(email,senha)
+    .then(()=>{document.getElementById('loginSenha').value='';})
+    .catch(e=>{err.textContent=(e.code==='auth/invalid-email')?'E-mail inválido.':'E-mail ou senha incorretos.';})
+    .finally(()=>{btn.disabled=false;btn.textContent='Entrar';});
+}
+function sair(){ if(confirm('Sair da base?')) firebase.auth().signOut(); }
+function conectar(){
+  if(db) return; // ja conectado, evita listeners duplicados
+  db=firebase.database();
   firebase.database().ref('.info/connected').on('value',s=>setStatus(!!s.val()));
   db.ref('painel/estado').on('value',snap=>{
     const d=snap.val();
@@ -182,7 +214,7 @@ function lancarMatricula(vendedorId){
   renderAdmin();
   const v=getVend(vendedorId);toast('🎉 Matrícula lançada para '+(v?v.nome:''));
 }
-conectar();renderAdmin();
+iniciar();renderAdmin();
 </script>
 </body>
 </html>
