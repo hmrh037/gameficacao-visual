@@ -252,11 +252,9 @@ let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=tr
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
-let playlistData={},playQueue=[],playPos=0,playerAudio=null,playlistAtual=null,duckTimer=null;
+let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,volComemoracao:100,periodo:'hoje'};
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
-let lastMusicaTs=0,primeiraMusica=true;
 
 // ---- Firebase ----
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
@@ -272,7 +270,7 @@ function conectar(){
   db.ref('painel/estado/config').on('value',s=>{
     const c=s.val();if(c)config={...config,...c};
     const np=config.periodo||'hoje';const pmudou=np!==periodo;periodo=np;
-    aplicarPlaylist();aplicarVolumes();renderPainel();
+    aplicarVolumes();renderPainel();
     if(pmudou)rebaseOrder();
   });
   db.ref('painel/celebra').on('value',snap=>{
@@ -294,11 +292,6 @@ function conectar(){
     const c=snap.val(); if(!c||!c.ts) return;
     if(primeiroRecebe){primeiroRecebe=false;lastRecebeTs=c.ts;return;} // nao comemora ao abrir
     if(c.ts!==lastRecebeTs){lastRecebeTs=c.ts; celebrarRecebimento(c.vendedorId,c.valor,c.forma);}
-  });
-  db.ref('painel/tocarMusica').on('value',snap=>{
-    const m=snap.val(); if(!m||!m.ts) return;
-    if(primeiraMusica){primeiraMusica=false;lastMusicaTs=m.ts;return;} // nao toca ao abrir
-    if(m.ts!==lastMusicaTs){lastMusicaTs=m.ts; tocarMusicaEspecifica(m.arq);}
   });
 }
 // ---- util ----
@@ -441,7 +434,6 @@ function tocarUltrapassagem(){if(!som)return;try{if(!somUltra)somUltra=new Audio
 function confeteEm(cont,n){const cores=['#d4af37','#00d084','#3b82f6','#ff4757','#a855f7','#ec4899','#fff'];for(let i=0;i<(n||70);i++){const c=document.createElement('div');c.className='confete';c.style.left=(Math.random()*100)+'vw';c.style.background=cores[Math.floor(Math.random()*cores.length)];c.style.animationDuration=(2.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*1)+'s';if(Math.random()>.5)c.style.borderRadius='50%';cont.appendChild(c);setTimeout(()=>c.remove(),6000);}}
 function mostrarUltrapassagem(xId,yId){
   const x=getVend(xId),y=getVend(yId);if(!x||!y)return;
-  duckMusica();
   const u=document.getElementById('ultra');u.classList.remove('hidden');
   const ava=v=>v.foto?`<img src="${v.foto}"/>`:`<span style="font-size:4vh">🧑‍💼</span>`;
   u.innerHTML=`<div class="ultra-banner"><span class="seta">🏎️💨</span><div class="ip">${ava(x)}<span class="nm">${x.nome}</span></div><span class="txt">ultrapassou</span><div class="ip" style="opacity:.7">${ava(y)}<span class="nm">${y.nome}</span></div></div>`;
@@ -453,7 +445,7 @@ function mostrarUltrapassagem(xId,yId){
 // ---- celebracao ----
 let celebTimer=null;
 function celebrar(vendedorId){
-  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();duckMusica();
+  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();
   const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#d4af37'};
   const qtdHoje=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hojeStr()).length;
   const marco=(qtdHoje>=5&&qtdHoje%5===0);
@@ -483,7 +475,7 @@ function tocarMatricula(){
 
 // ---- comemoracao de RECEBIMENTO (formato proprio: dinheiro) ----
 function celebrarRecebimento(vendedorId,valor,forma){
-  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();duckMusica();
+  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();
   const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#00d084'};
   const fic=FORMA_ICON[forma]||'💳';
   const cel=document.getElementById('recebe');cel.classList.remove('hidden');
@@ -513,70 +505,20 @@ function tocarDinheiro(){
 }
 function pararDinheiro(){try{if(somDinheiro){somDinheiro.pause();somDinheiro.currentTime=0;}}catch(e){}}
 
-// ---- musica ambiente (playlist) ----
-function volMus(){return Math.max(0,Math.min(1,(config.volMusica==null?25:config.volMusica)/100));}
+// ---- volumes dos sons de comemoracao ----
 function volCom(){return Math.max(0,Math.min(1,(config.volComemoracao==null?100:config.volComemoracao)/100));}
-function carregarPlaylists(){ fetch('playlists.json?t='+Date.now()).then(r=>r.json()).then(d=>{playlistData=d||{};aplicarPlaylist();}).catch(()=>{}); }
-function aplicarPlaylist(){
-  const nome=config.playlist||'';
-  const mudou=(nome!==playlistAtual);
-  playlistAtual=nome;
-  if(mudou){playQueue=(playlistData[nome]||[]).slice();playPos=0;if(playerAudio)playerAudio.pause();mostrarMusica('');}
-  else if(!playQueue.length){playQueue=(playlistData[nome]||[]).slice();}
-  aplicarVolumes();
-  if(painelAtivo && playQueue.length && (!playerAudio||playerAudio.paused||mudou)) tocarProximaMusica();
-}
-function tocarProximaMusica(){
-  if(!painelAtivo||!playQueue.length){mostrarMusica('');return;}
-  if(playPos>=playQueue.length)playPos=0;
-  const arq=playQueue[playPos];
-  if(!playerAudio){
-    playerAudio=new Audio();
-    playerAudio.addEventListener('ended',()=>{playPos++;tocarProximaMusica();});
-    playerAudio.addEventListener('error',()=>{playPos++;setTimeout(tocarProximaMusica,600);});
-  }
-  playerAudio.src='musicas/'+encodeURIComponent(playlistAtual)+'/'+encodeURIComponent(arq);
-  playerAudio.volume=(duckTimer?volMus()*0.2:volMus());
-  mostrarMusica(nomeLimpo(arq));
-  playerAudio.play().catch(()=>{});
-}
-// toca uma musica especifica escolhida no painel e segue a playlist a partir dela
-function tocarMusicaEspecifica(arq){
-  if(!arq||!painelAtivo)return;
-  if(!playQueue.length)playQueue=(playlistData[playlistAtual]||[]).slice();
-  const idx=playQueue.indexOf(arq);
-  if(idx>=0)playPos=idx; else {playQueue.unshift(arq);playPos=0;}
-  if(playerAudio){playerAudio.pause();}
-  tocarProximaMusica();
-}
-function nomeLimpo(arq){
-  let s=(arq||'').replace(/\.[^.]+$/,'');          // tira a extensao
-  s=s.replace(/^YTDown[_\s-]*YouTube[_\s-]*/i,''); // tira prefixo do baixador (YTDown_YouTube_)
-  s=s.replace(/[_\s-]Media[_\s-].*$/i,'');         // tira o lixo final (_Media_<id>_009_128k)
-  s=s.replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
-  return s||arq;
-}
-function mostrarMusica(txt){const el=document.getElementById('agora');if(!el)return;el.textContent=txt?('🎵 '+txt):'';el.style.opacity=txt?'1':'0';}
 function aplicarVolumes(){
-  if(playerAudio && !duckTimer) playerAudio.volume=volMus();
   const vc=volCom();
   if(somUltra)somUltra.volume=vc;
   if(somGrilo)somGrilo.volume=vc;
   if(somDinheiro)somDinheiro.volume=vc;
   if(somMatricula)somMatricula.volume=vc;
 }
-function duckMusica(){
-  if(!playerAudio)return;
-  playerAudio.volume=Math.max(0,volMus()*0.2);
-  clearTimeout(duckTimer);
-  duckTimer=setTimeout(()=>{duckTimer=null;if(playerAudio)playerAudio.volume=volMus();},(config.tempoCeleb||8)*1000+600);
-}
 
 // ---- inatividade (grilo) ----
 let griloTimer=null;
 function tocarSomGrilo(){if(!som)return;try{if(!somGrilo)somGrilo=new Audio(SOM_GRILO);somGrilo.volume=volCom();somGrilo.currentTime=0;somGrilo.play().catch(()=>{});}catch(e){}}
 function mostrarGrilo(){
-  duckMusica();
   const g=document.getElementById('grilo');g.classList.remove('hidden');
   g.innerHTML=`<div class="grilo-box"><div class="grilo-emoji">🦗</div><div class="grilo-t">Tá muito quieto por aqui...</div><div class="grilo-s">Bora vender! 🚀</div></div>`;
   tocarSomGrilo();
@@ -590,9 +532,9 @@ function checarInatividade(){
 }
 setInterval(checarInatividade,20000);
 
-function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();aplicarPlaylist();}
+function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();}
 setInterval(proximoSlide,7000);
-conectar();renderPainel();carregarPlaylists();
+conectar();renderPainel();
 </script>
 </body>
 </html>

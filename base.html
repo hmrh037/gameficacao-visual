@@ -105,25 +105,6 @@
   </div>
 
   <div class="acard">
-    <h2>🎵 Música ambiente (playlist)</h2>
-    <div class="row" style="align-items:flex-end">
-      <div class="fld"><label>Playlist que toca nas TVs</label>
-        <select id="cfgPlaylist" onchange="setPlaylist(this.value)"><option value="">(nenhuma)</option></select>
-      </div>
-      <div class="fld"><label>▶️ Tocar uma música agora</label>
-        <select id="cfgMusica" onchange="tocarMusica(this.value)"><option value="">(escolher música…)</option></select>
-      </div>
-      <div class="fld"><label>🔉 Volume da música (ambiente) — <span id="volMusicaLbl">25%</span></label>
-        <input id="cfgVolMusica" type="range" min="0" max="100" step="1" oninput="setVolMusica(this.value)" style="width:220px"/>
-      </div>
-      <div class="fld"><label>🔊 Volume das comemorações — <span id="volComLbl">100%</span></label>
-        <input id="cfgVolCom" type="range" min="0" max="100" step="1" oninput="setVolCom(this.value)" style="width:220px"/>
-      </div>
-    </div>
-    <div class="hint" style="margin-top:6px">A música da playlist toca <b>baixinho de fundo</b> nas TVs; as comemorações (matrícula, ultrapassagem, recebimento) tocam <b>mais alto</b> por cima. Para adicionar/trocar músicas, veja o <b>LEIA-ME.txt</b> dentro da pasta <b>musicas</b> e rode o <b>atualizar-musicas.bat</b>.</div>
-  </div>
-
-  <div class="acard">
     <h2>👥 Equipes</h2>
     <div id="equipesAdmin"></div>
   </div>
@@ -158,15 +139,12 @@
 <script>
 const uid=()=>Date.now()+Math.floor(Math.random()*100000);
 let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
-let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
-let db=null,pronto=false,playlistsBase={};
+let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,periodo:'hoje'};
+let db=null,pronto=false;
 function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarConfig();}
 function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarConfig();}
 function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarConfig();}
 function setPeriodo(v){config.periodo=v||'hoje';salvarConfig();}
-function setPlaylist(v){config.playlist=v||'';salvarConfig();popularMusicas();}
-function setVolMusica(v){config.volMusica=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volMusicaLbl').textContent=config.volMusica+'%';salvarConfig();}
-function setVolCom(v){config.volComemoracao=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volComLbl').textContent=config.volComemoracao+'%';salvarConfig();}
 
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
 // ---- autenticacao do gestor ----
@@ -174,7 +152,7 @@ function iniciar(){
   if(!cfgValida()){document.getElementById('aviso').style.display='flex';return;}
   if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
   firebase.auth().onAuthStateChanged(u=>{
-    if(u){ document.getElementById('login').style.display='none'; document.querySelector('.wrap').style.display='block'; conectar(); carregarPlaylistsBase(); }
+    if(u){ document.getElementById('login').style.display='none'; document.querySelector('.wrap').style.display='block'; conectar(); }
     else { document.getElementById('login').style.display='flex'; document.querySelector('.wrap').style.display='none'; }
   });
 }
@@ -260,34 +238,6 @@ function renderAdmin(){
   const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
   const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
   const cpd=document.getElementById('cfgPeriodo');if(cpd&&document.activeElement!==cpd)cpd.value=config.periodo||'hoje';
-  const cp=document.getElementById('cfgPlaylist');if(cp&&document.activeElement!==cp)cp.value=config.playlist||'';
-  const vm=(config.volMusica==null?25:config.volMusica),vc=(config.volComemoracao==null?100:config.volComemoracao);
-  const evm=document.getElementById('cfgVolMusica');if(evm&&document.activeElement!==evm){evm.value=vm;document.getElementById('volMusicaLbl').textContent=vm+'%';}
-  const evc=document.getElementById('cfgVolCom');if(evc&&document.activeElement!==evc){evc.value=vc;document.getElementById('volComLbl').textContent=vc+'%';}
-}
-function carregarPlaylistsBase(){
-  fetch('playlists.json?t='+Date.now()).then(r=>r.json()).then(d=>{
-    playlistsBase=d||{};
-    const sel=document.getElementById('cfgPlaylist');if(!sel)return;
-    const nomes=Object.keys(playlistsBase);
-    sel.innerHTML='<option value="">(nenhuma)</option>'+nomes.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">${n} (${(playlistsBase[n]||[]).length} música(s))</option>`).join('');
-    sel.value=config.playlist||'';
-    popularMusicas();
-  }).catch(()=>{});
-}
-function nomeLimpoBase(arq){let s=(arq||'').replace(/\.[^.]+$/,'');s=s.replace(/^YTDown[_\s-]*YouTube[_\s-]*/i,'');s=s.replace(/[_\s-]Media[_\s-].*$/i,'');return s.replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim()||arq;}
-function popularMusicas(){
-  const sel=document.getElementById('cfgMusica');if(!sel)return;
-  const lista=playlistsBase[config.playlist||'']||[];
-  sel.innerHTML='<option value="">(escolher música…)</option>'+lista.map(a=>`<option value="${a.replace(/"/g,'&quot;')}">${nomeLimpoBase(a)}</option>`).join('');
-  sel.value='';
-}
-function tocarMusica(arq){
-  if(!arq)return;
-  if(!config.playlist){alert('Escolha uma playlist primeiro.');return;}
-  if(db) db.ref('painel/tocarMusica').set({playlist:config.playlist,arq,ts:Date.now()});
-  toast('🎵 Tocando: '+nomeLimpoBase(arq));
-  const sel=document.getElementById('cfgMusica');if(sel)sel.value='';
 }
 function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEquipes();renderAdmin();}}
 const PALETA=["#2563eb","#ef4444","#22c55e","#a855f7","#f59e0b","#ec4899","#06b6d4","#84cc16"];
