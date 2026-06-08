@@ -241,12 +241,13 @@ const SHIELD_IMG="exemplo.webp";
 const SOM_ULTRA="ultrapassagem.mpeg";
 const SOM_GRILO="grilo.mp3";
 const SOM_DINHEIRO="money.mp3";
+const SOM_MATRICULA="matricula.mp3";
 const FORMA_ICON={'Cartão':'💳','À vista':'💵','Boleto':'🧾','PIX':'⚡'};
 let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=true;
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100};
+let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100};
 let playlistData={},playQueue=[],playPos=0,playerAudio=null,playlistAtual=null,duckTimer=null;
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
@@ -446,7 +447,7 @@ function celebrar(vendedorId){
     <div class="titulo">⚡ NOVA MATRÍCULA! ⚡</div><div class="nome">${v.nome}</div>
     <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
     <div class="extra">${qtdHoje}ª matrícula hoje — mandou bem! 🚀</div>${conquista}</div>`;
-  soltarBaloes(eq.cor);soltarConfete();if(marco)soltarConfete();tocarFanfarra();
+  soltarBaloes(eq.cor);soltarConfete();if(marco)soltarConfete();tocarMatricula();
   clearTimeout(celebTimer);celebTimer=setTimeout(()=>cel.classList.add('hidden'),(config.tempoCeleb||8)*1000);
   cel.onclick=()=>cel.classList.add('hidden');
 }
@@ -454,6 +455,16 @@ function soltarBaloes(cor){const cores=[cor,'#d4af37','#00d084','#3b82f6','#ff47
 function soltarConfete(){const cores=['#d4af37','#00d084','#3b82f6','#ff4757','#a855f7','#ec4899','#fff'];const cel=document.getElementById('celebra');for(let i=0;i<70;i++){const c=document.createElement('div');c.className='confete';c.style.left=(Math.random()*100)+'vw';c.style.background=cores[Math.floor(Math.random()*cores.length)];c.style.animationDuration=(2.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*1.2)+'s';if(Math.random()>.5)c.style.borderRadius='50%';cel.appendChild(c);setTimeout(()=>c.remove(),6000);}}
 let audioCtx=null;
 function tocarFanfarra(){if(!som)return;if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}}if(audioCtx.state==='suspended')audioCtx.resume();const notas=[523.25,659.25,783.99,1046.5,1046.5],dur=[.16,.16,.16,.18,.5];let t=audioCtx.currentTime+.02;notas.forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0001,.35*volCom()),t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur[i]);o.start(t);o.stop(t+dur[i]+.02);t+=dur[i]*.9;});}
+function tocarMatricula(){
+  if(!som)return;
+  try{
+    if(!somMatricula)somMatricula=new Audio(SOM_MATRICULA);
+    somMatricula.volume=volCom();
+    somMatricula.currentTime=0;
+    const p=somMatricula.play();
+    if(p&&p.catch)p.catch(()=>tocarFanfarra()); // se faltar o arquivo matricula.mp3, usa a fanfarra sintetizada
+  }catch(e){tocarFanfarra();}
+}
 
 // ---- comemoracao de RECEBIMENTO (formato proprio: dinheiro) ----
 function celebrarRecebimento(vendedorId,valor,forma){
@@ -530,6 +541,7 @@ function aplicarVolumes(){
   if(somUltra)somUltra.volume=vc;
   if(somGrilo)somGrilo.volume=vc;
   if(somDinheiro)somDinheiro.volume=vc;
+  if(somMatricula)somMatricula.volume=vc;
 }
 function duckMusica(){
   if(!playerAudio)return;
