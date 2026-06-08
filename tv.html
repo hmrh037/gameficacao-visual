@@ -216,7 +216,6 @@
     </nav>
     <div class="navright">
       <div class="clock"><div class="hora" id="hora">--:--</div><div class="data" id="data">—</div></div>
-      <div class="navstatus"><span class="dot" id="dot"></span><span id="statusTxt">conectando...</span></div>
     </div>
   </header>
   <section class="indices" id="equipes"></section>
@@ -313,7 +312,7 @@ function conectar(){
     if(c.ts!==lastRecebeTs){lastRecebeTs=c.ts; celebrarRecebimento(c.vendedorId,c.valor,c.forma);}
   });
 }
-function setStatus(on){const t=document.getElementById('statusTxt'),d=document.getElementById('dot');d.classList.toggle('on',on);t.textContent=on?'conectado':'sem conexão';}
+function setStatus(on){const t=document.getElementById('statusTxt'),d=document.getElementById('dot');if(d)d.classList.toggle('on',on);if(t)t.textContent=on?'conectado':'sem conexão';}
 
 // ---- util ----
 const fmtBRL=n=>(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
