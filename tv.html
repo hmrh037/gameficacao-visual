@@ -484,7 +484,6 @@ function tocarMatricula(){
 function celebrarRecebimento(vendedorId,valor,forma){
   ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();duckMusica();
   const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#00d084'};
-  const totHoje=recebimentos.filter(r=>r.vendedorId===vendedorId&&r.data===hojeStr()).reduce((s,r)=>s+(Number(r.valor)||0),0);
   const fic=FORMA_ICON[forma]||'💳';
   const cel=document.getElementById('recebe');cel.classList.remove('hidden');
   cel.innerHTML=`<div class="moeda-bg"></div><div class="heroi heroi-r">
@@ -493,8 +492,7 @@ function celebrarRecebimento(vendedorId,valor,forma){
     <div class="nome">${v.nome}</div>
     <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
     ${forma?`<div class="forma-r">${fic} ${forma}</div>`:''}
-    <div class="valor-r">${fmtBRL(valor)}</div>
-    <div class="extra">entrou no caixa! 🎉 — hoje já são ${fmtBRL(totHoje)}</div></div>`;
+    <div class="valor-r">${fmtBRL(valor)}</div></div>`;
   choverDinheiro();confeteEm(cel,90);tocarDinheiro();
   clearTimeout(recebeTimer);recebeTimer=setTimeout(esconderRecebe,(config.tempoCeleb||8)*1000);
   cel.onclick=esconderRecebe;
