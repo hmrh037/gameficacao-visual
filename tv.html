@@ -256,13 +256,13 @@ const FORMA_ICON={'Cartão':'💳','À vista':'💵','Boleto':'🧾','PIX':'⚡'
 // Ligas (tiers) pelo TOTAL GERAL de matriculas — do mais fraco ao mais forte
 const TIERS=[
   {nome:'Bronze',min:1,cor:'#cd7f32',img:'tiers/bronze.png'},
-  {nome:'Silver',min:10,cor:'#cbd5e1',img:'tiers/silver.png'},
-  {nome:'Gold',min:25,cor:'#d4af37',img:'tiers/gold.png'},
-  {nome:'Platinum',min:50,cor:'#5eead4',img:'tiers/platinum.png'},
-  {nome:'Diamond',min:90,cor:'#60a5fa',img:'tiers/diamond.png'},
-  {nome:'Elite',min:150,cor:'#a78bfa',img:'tiers/elite.png'},
-  {nome:'Champion',min:230,cor:'#fb923c',img:'tiers/champion.png'},
-  {nome:'Unreal',min:350,cor:'#c084fc',img:'tiers/unreal.png'}
+  {nome:'Silver',min:2,cor:'#cbd5e1',img:'tiers/silver.png'},
+  {nome:'Gold',min:3,cor:'#d4af37',img:'tiers/gold.png'},
+  {nome:'Platinum',min:4,cor:'#5eead4',img:'tiers/platinum.png'},
+  {nome:'Diamond',min:5,cor:'#60a5fa',img:'tiers/diamond.png'},
+  {nome:'Elite',min:6,cor:'#a78bfa',img:'tiers/elite.png'},
+  {nome:'Champion',min:7,cor:'#fb923c',img:'tiers/champion.png'},
+  {nome:'Unreal',min:8,cor:'#c084fc',img:'tiers/unreal.png'}
 ];
 function tierIdx(total){let idx=-1;for(let i=0;i<TIERS.length;i++){if(total>=TIERS[i].min)idx=i;}return idx;}
 function totalGeralVend(id){return matriculas.filter(m=>m.vendedorId===id).length;}
