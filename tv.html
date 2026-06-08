@@ -244,7 +244,7 @@
   <section class="podio" id="podio"></section>
   <section class="corpo">
     <div class="card">
-      <div class="cardhead"><h2>📊 Ranking dos Vendedores</h2><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
+      <div class="cardhead"><h2>📋 Demais Colocações</h2><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
       <div class="thead"><span>#</span><span>Vendedor</span><span class="r">Matr.</span><span class="r">Receita</span><span>Progresso</span></div>
       <div class="ranking" id="ranking"></div>
     </div>
@@ -378,11 +378,12 @@ function iniciais(n){return (n||'').trim().split(/\s+/).map(p=>p[0]||'').slice(0
 function renderRanking(){
   const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);const max=Math.max(1,...arr.map(a=>a.qtd));
   const el=document.getElementById('ranking');
-  if(!arr.length){el.innerHTML='<div class="vazio">Aguardando dados da base...</div>';return;}
-  el.innerHTML=arr.slice(0,8).map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
+  const resto=arr.slice(3,11); // 4o em diante (Top 3 fica no podio)
+  if(!resto.length){el.innerHTML='<div class="vazio">O Top 3 está no pódio acima 🏆<br>As demais colocações aparecem aqui.</div>';return;}
+  el.innerHTML=resto.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow" data-vid="${a.v.id}">
-      <span class="t-rank">${i+1}</span>
+      <span class="t-rank">${i+4}</span>
       <span class="t-vend">${medalHTML(totalGeralVend(a.v.id),'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec">${fmtBRL(a.valor)}</span>
