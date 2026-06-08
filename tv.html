@@ -112,6 +112,15 @@
   #grilo .grilo-emoji{font-size:18vh;animation:pulsa 1.2s ease-in-out infinite;}
   #grilo .grilo-t{font-size:4.5vh;font-weight:900;color:var(--gold);margin-top:1vh;}
   #grilo .grilo-s{font-size:3vh;font-weight:800;color:var(--text);margin-top:.6vh;}
+  #recebe{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, rgba(6,40,18,.92), rgba(2,12,6,.94));backdrop-filter:blur(4px);overflow:hidden;}
+  #recebe .moeda-bg{position:absolute;width:160vh;height:160vh;background:repeating-conic-gradient(from 0deg,#22c55e 0deg 9deg,transparent 9deg 18deg);opacity:.15;animation:girar 9s linear infinite;}
+  .heroi-r{position:relative;text-align:center;}
+  .heroi-r .cofre{font-size:13vh;animation:pulsa 1.2s ease-in-out infinite;line-height:1;}
+  .heroi-r .foto-r{width:24vh;height:24vh;border-radius:50%;margin:1vh auto;overflow:hidden;border:.7vh solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:12vh;background:#0008;box-shadow:0 0 45px #22c55e80;}
+  .heroi-r .foto-r img{width:100%;height:100%;object-fit:cover;}
+  .titulo-r{color:#4ade80!important;}
+  .valor-r{font-size:8vh;font-weight:900;color:#4ade80;margin-top:.6vh;text-shadow:0 4px 0 #00000060;letter-spacing:1px;animation:pulsa 1.1s ease-in-out infinite;}
+  .moeda{position:absolute;top:-7vh;z-index:1;animation:cai linear forwards;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -148,6 +157,7 @@
 </div>
 
 <div id="celebra" class="hidden"></div>
+<div id="recebe" class="hidden"></div>
 <div id="ultra" class="hidden"></div>
 <div id="grilo" class="hidden"></div>
 <div class="status" id="status"><span class="dot" id="dot"></span><span id="statusTxt">conectando...</span></div>
@@ -160,7 +170,8 @@
 const SHIELD_IMG="exemplo.webp";
 const SOM_ULTRA="ultrapassagem.mpeg";
 const SOM_GRILO="grilo.mp3";
-let equipes=[],vendedores=[],matriculas=[],periodo='hoje',som=true;
+let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=true;
+let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
 let prevOrder=null,somUltra=null,somGrilo=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0};
@@ -176,7 +187,7 @@ function conectar(){
   firebase.database().ref('.info/connected').on('value',s=>setStatus(!!s.val()));
   db.ref('painel/estado').on('value',snap=>{
     const d=snap.val()||{};
-    equipes=d.equipes||[]; vendedores=d.vendedores||[]; matriculas=d.matriculas||[];
+    equipes=d.equipes||[]; vendedores=d.vendedores||[]; matriculas=d.matriculas||[]; recebimentos=d.recebimentos||[];
     if(d.config)config={...config,...d.config};
     renderPainel();
     checarUltra();
@@ -195,6 +206,11 @@ function conectar(){
     const g=snap.val(); if(!g||!g.ts) return;
     if(primeiroGrilo){primeiroGrilo=false;lastGriloTs=g.ts;return;}
     if(g.ts!==lastGriloTs){lastGriloTs=g.ts; mostrarGrilo();}
+  });
+  db.ref('painel/recebe').on('value',snap=>{
+    const c=snap.val(); if(!c||!c.ts) return;
+    if(primeiroRecebe){primeiroRecebe=false;lastRecebeTs=c.ts;return;} // nao comemora ao abrir
+    if(c.ts!==lastRecebeTs){lastRecebeTs=c.ts; celebrarRecebimento(c.vendedorId,c.valor);}
   });
 }
 function setStatus(on){const t=document.getElementById('statusTxt'),d=document.getElementById('dot');d.classList.toggle('on',on);t.textContent=on?'conectado à base':'sem conexão';}
@@ -303,6 +319,27 @@ function soltarBaloes(cor){const cores=[cor,'#fbbf24','#22c55e','#3b82f6','#ef44
 function soltarConfete(){const cores=['#fbbf24','#22c55e','#3b82f6','#ef4444','#a855f7','#ec4899','#fff'];const cel=document.getElementById('celebra');for(let i=0;i<70;i++){const c=document.createElement('div');c.className='confete';c.style.left=(Math.random()*100)+'vw';c.style.background=cores[Math.floor(Math.random()*cores.length)];c.style.animationDuration=(2.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*1.2)+'s';if(Math.random()>.5)c.style.borderRadius='50%';cel.appendChild(c);setTimeout(()=>c.remove(),6000);}}
 let audioCtx=null;
 function tocarFanfarra(){if(!som)return;if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}}if(audioCtx.state==='suspended')audioCtx.resume();const notas=[523.25,659.25,783.99,1046.5,1046.5],dur=[.16,.16,.16,.18,.5];let t=audioCtx.currentTime+.02;notas.forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur[i]);o.start(t);o.stop(t+dur[i]+.02);t+=dur[i]*.9;});}
+
+// ---- comemoracao de RECEBIMENTO (formato proprio: dinheiro) ----
+function celebrarRecebimento(vendedorId,valor){
+  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();
+  const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#22c55e'};
+  const totHoje=recebimentos.filter(r=>r.vendedorId===vendedorId&&r.data===hojeStr()).reduce((s,r)=>s+(Number(r.valor)||0),0);
+  const cel=document.getElementById('recebe');cel.classList.remove('hidden');
+  cel.innerHTML=`<div class="moeda-bg"></div><div class="heroi heroi-r">
+    <div class="cofre">🤑</div>
+    <div class="foto-r">${v.foto?`<img src="${v.foto}"/>`:'💰'}</div>
+    <div class="titulo titulo-r">💸 RECEBIMENTO! 💸</div>
+    <div class="nome">${v.nome}</div>
+    <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
+    <div class="valor-r">${fmtBRL(valor)}</div>
+    <div class="extra">entrou no caixa! 🎉 — hoje já são ${fmtBRL(totHoje)}</div></div>`;
+  choverDinheiro();tocarCaixa();
+  clearTimeout(recebeTimer);recebeTimer=setTimeout(()=>cel.classList.add('hidden'),(config.tempoCeleb||8)*1000);
+  cel.onclick=()=>cel.classList.add('hidden');
+}
+function choverDinheiro(){const ic=['💵','💰','🪙','💸','🤑','💲'];const cel=document.getElementById('recebe');for(let i=0;i<46;i++){const d=document.createElement('div');d.className='moeda';d.textContent=ic[Math.floor(Math.random()*ic.length)];d.style.left=(Math.random()*100)+'vw';d.style.fontSize=(2.2+Math.random()*3.2)+'vh';d.style.animationDuration=(2.4+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*1.2)+'s';cel.appendChild(d);setTimeout(()=>d.remove(),6000);}}
+function tocarCaixa(){if(!som)return;if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}}if(audioCtx.state==='suspended')audioCtx.resume();const notas=[1318.5,1567.98,2093.0],dur=[.10,.10,.5];let t=audioCtx.currentTime+.02;notas.forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.28,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur[i]);o.start(t);o.stop(t+dur[i]+.02);t+=dur[i]*.75;});}
 
 // ---- inatividade (grilo) ----
 let griloTimer=null;

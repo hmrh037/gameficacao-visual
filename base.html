@@ -38,6 +38,18 @@
   #aviso h2{color:var(--gold);margin-bottom:12px;}#aviso p{color:var(--muted);line-height:1.6;}
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#06210f;padding:12px 24px;border-radius:999px;font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;}
   .toast.show{opacity:1;}
+  .lanc{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+  .lanc .lv{display:flex;align-items:center;gap:10px;min-width:150px;flex:1;}
+  .lanc .lv img,.lanc .lv .fl-ph{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--border);background:#0008;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .lanc .ln{font-weight:800;font-size:15px;}
+  .lanc .lc{display:flex;flex-direction:column;gap:5px;}
+  .lanc .lcl{font-size:11px;color:var(--muted);}
+  .step{display:flex;align-items:center;gap:6px;}
+  .step .sb{width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:22px;font-weight:900;line-height:1;cursor:pointer;}
+  .step .sb:hover{border-color:var(--gold);}
+  .step .sb.mais{background:var(--gold);color:#1a1300;border-color:var(--gold);}
+  .step .sn{width:66px;text-align:center;font-size:20px;font-weight:900;}
+  .step .rv{width:110px;}
 </style>
 </head>
 <body>
@@ -66,9 +78,9 @@
   <div class="hint">Tudo o que você cadastrar/lançar aqui aparece nas TVs em tempo real (elas abrem o arquivo <b>tv.html</b>).</div>
 
   <div class="acard">
-    <h2>🚀 Lançar Nova Matrícula</h2>
-    <div class="hint">Clique no vendedor que fez a venda — todas as TVs comemoram na hora.</div>
-    <div class="big-mat" id="botoesMat"></div>
+    <h2>🚀 Lançar Matrículas e Recebimentos</h2>
+    <div class="hint">Ajuste as <b>matrículas de hoje</b> de cada vendedor com os botões <b>−</b> e <b>+</b> (ou digite o número). Para um <b>recebimento</b>, informe o valor e clique em <b>💰 Receber</b>. Cada lançamento comemora nas TVs.</div>
+    <div id="botoesMat"></div>
   </div>
 
   <div class="acard">
@@ -98,6 +110,11 @@
   </div>
 
   <div class="acard">
+    <h2>💰 Recebimentos lançados</h2>
+    <div id="listaReceb" style="max-height:240px;overflow:auto"></div>
+  </div>
+
+  <div class="acard">
     <h2>🗑 Matrículas lançadas</h2>
     <div id="listaMat" style="max-height:240px;overflow:auto"></div>
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
@@ -116,7 +133,7 @@
 <script>
 const uid=()=>Date.now()+Math.floor(Math.random()*100000);
 let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
-let vendedores=[],matriculas=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0};
+let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0};
 let db=null,pronto=false;
 function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarEstado();}
 function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarEstado();}
@@ -149,17 +166,23 @@ function conectar(){
   firebase.database().ref('.info/connected').on('value',s=>setStatus(!!s.val()));
   db.ref('painel/estado').on('value',snap=>{
     const d=snap.val();
-    if(d){equipes=d.equipes||equipes;vendedores=d.vendedores||[];matriculas=d.matriculas||[];if(d.config)config={...config,...d.config};}
+    if(d){equipes=d.equipes||equipes;vendedores=d.vendedores||[];matriculas=d.matriculas||[];recebimentos=d.recebimentos||[];if(d.config)config={...config,...d.config};}
     else{ salvarEstado(); } // primeira vez: cria estado inicial
     pronto=true;renderAdmin();
   });
 }
 function setStatus(on){document.getElementById('dot').classList.toggle('on',on);document.getElementById('statusTxt').textContent=on?'conectado — TVs recebendo':'sem conexão';}
-function salvarEstado(){ if(db) db.ref('painel/estado').set({equipes,vendedores,matriculas,config}); }
+function salvarEstado(){ if(db) db.ref('painel/estado').set({equipes,vendedores,matriculas,recebimentos,config}); }
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
 
 const getEq=id=>equipes.find(e=>e.id===id);
 const getVend=id=>vendedores.find(v=>v.id===id);
+const hojeStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const fmtBRL=n=>(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const matHoje=id=>matriculas.filter(m=>m.vendedorId===id&&m.data===hojeStr()).length;
+const recHoje=id=>recebimentos.filter(r=>r.vendedorId===id&&r.data===hojeStr()).length;
+const recTotHoje=id=>recebimentos.filter(r=>r.vendedorId===id&&r.data===hojeStr()).reduce((s,r)=>s+(Number(r.valor)||0),0);
+const fotoLanc=v=>v.foto?`<img src="${v.foto}"/>`:`<div class="fl-ph">🧑‍💼</div>`;
 
 function renderAdmin(){
   document.getElementById('vEquipe').innerHTML=equipes.map(e=>`<option value="${e.id}">${e.nome}</option>`).join('');
@@ -171,14 +194,32 @@ function renderAdmin(){
       <button class="btn red" onclick="delEquipe(${e.id})" title="Remover equipe">✕</button>
     </div>`).join('')+`<button class="btn sec" onclick="addEquipe()" style="margin-top:4px">+ Adicionar equipe</button>`;
   document.getElementById('botoesMat').innerHTML=vendedores.length?vendedores.map(v=>`
-    <button class="vbtn" onclick="lancarMatricula(${v.id})">
-      ${v.foto?`<img src="${v.foto}"/>`:`<div style="width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0008;font-size:26px">🧑‍💼</div>`}
-      <div class="vn">${v.nome}</div></button>`).join(''):'<div class="hint">Cadastre vendedores abaixo primeiro.</div>';
+    <div class="lanc">
+      <div class="lv">${fotoLanc(v)}<span class="ln">${v.nome}</span></div>
+      <div class="lc">
+        <span class="lcl">📈 Matrículas hoje</span>
+        <div class="step">
+          <button class="sb" onclick="addMat(${v.id},-1)">−</button>
+          <input class="sn" type="number" min="0" step="1" value="${matHoje(v.id)}" onchange="setMat(${v.id},this.value)"/>
+          <button class="sb mais" onclick="addMat(${v.id},1)">+</button>
+        </div>
+      </div>
+      <div class="lc">
+        <span class="lcl">💰 Recebimento (R$)</span>
+        <div class="step">
+          <input class="rv" id="rv${v.id}" type="text" inputmode="decimal" placeholder="0,00" onkeydown="if(event.key==='Enter')addRecebimento(${v.id})"/>
+          <button class="btn" style="padding:9px 14px;white-space:nowrap" onclick="addRecebimento(${v.id})">💰 Receber</button>
+        </div>
+        <span class="lcl" style="margin-top:2px">Hoje: ${recHoje(v.id)} recebimento(s) · ${fmtBRL(recTotHoje(v.id))}</span>
+      </div>
+    </div>`).join(''):'<div class="hint">Cadastre vendedores abaixo primeiro.</div>';
   document.getElementById('tabVend').innerHTML=vendedores.map(v=>{const eq=getEq(v.equipeId)||{nome:'—',cor:'#888'};const qtd=matriculas.filter(m=>m.vendedorId===v.id).length;
     return `<tr><td>${v.foto?`<img class="av" src="${v.foto}"/>`:'🧑‍💼'}</td><td>${v.nome}</td><td><span class="chip" style="background:${eq.cor}33;color:${eq.cor}">${eq.nome}</span></td><td>${qtd}</td>
       <td><button class="btn sec" onclick="trocarFoto(${v.id})">📷</button> <button class="btn red" onclick="delVendedor(${v.id})">✕</button></td></tr>`;}).join('');
   const ms=[...matriculas].sort((a,b)=>b.id-a.id).slice(0,40);
   document.getElementById('listaMat').innerHTML=ms.length?ms.map(m=>{const v=getVend(m.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — ${new Date(m.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delMatricula(${m.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhuma matrícula lançada ainda.</div>';
+  const rs=[...recebimentos].sort((a,b)=>b.id-a.id).slice(0,40);
+  const lr=document.getElementById('listaReceb');if(lr)lr.innerHTML=rs.length?rs.map(r=>{const v=getVend(r.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — <b style="color:var(--green)">${fmtBRL(r.valor)}</b> — ${new Date(r.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delRecebimento(${r.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhum recebimento lançado ainda.</div>';
   const ct=document.getElementById('cfgTempo');if(ct)ct.value=config.tempoCeleb||8;
   const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
   const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
@@ -207,13 +248,51 @@ function testarUltra(){
   toast('🏎️ Teste de ultrapassagem enviado às TVs');
 }
 function tocarGrilo(){if(db)db.ref('painel/grilo').set({ts:Date.now()});toast('🦗 Grilo enviado às TVs');}
-function lancarMatricula(vendedorId){
-  const m={id:uid(),vendedorId,valor:Number(config.valorMatricula)||0,data:(function(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})(),dt:Date.now()};
+function addMat(vendedorId,delta){
+  if(delta>0){ lancarUmaMat(vendedorId); }
+  else { // remove a matrícula mais recente de hoje
+    const hoje=hojeStr();
+    const mine=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hoje).sort((a,b)=>b.dt-a.dt);
+    if(mine[0]){ matriculas=matriculas.filter(m=>m.id!==mine[0].id); salvarEstado(); renderAdmin(); }
+  }
+}
+function lancarUmaMat(vendedorId){
+  const m={id:uid(),vendedorId,valor:Number(config.valorMatricula)||0,data:hojeStr(),dt:Date.now()};
   matriculas.push(m);salvarEstado();
   if(db) db.ref('painel/celebra').set({vendedorId,ts:Date.now(),id:m.id}); // dispara comemoracao nas TVs
   renderAdmin();
   const v=getVend(vendedorId);toast('🎉 Matrícula lançada para '+(v?v.nome:''));
 }
+function setMat(vendedorId,val){
+  val=Math.max(0,parseInt(val)||0);
+  const hoje=hojeStr(), atual=matHoje(vendedorId), diff=val-atual;
+  if(diff>0){
+    let last=null;
+    for(let i=0;i<diff;i++){const m={id:uid()+i,vendedorId,valor:Number(config.valorMatricula)||0,data:hoje,dt:Date.now()+i};matriculas.push(m);last=m;}
+    salvarEstado();
+    if(db&&last) db.ref('painel/celebra').set({vendedorId,ts:Date.now(),id:last.id});
+  } else if(diff<0){
+    const mine=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hoje).sort((a,b)=>b.dt-a.dt);
+    const rem=mine.slice(0,-diff).map(m=>m.id);
+    matriculas=matriculas.filter(m=>rem.indexOf(m.id)<0);
+    salvarEstado();
+  }
+  renderAdmin();
+}
+function addRecebimento(vendedorId){
+  const inp=document.getElementById('rv'+vendedorId);
+  let v=((inp&&inp.value)||'').trim();
+  if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');
+  const valor=Math.max(0,parseFloat(v)||0);
+  if(valor<=0){alert('Informe o valor do recebimento.');return;}
+  const r={id:uid(),vendedorId,valor,data:hojeStr(),dt:Date.now()};
+  recebimentos.push(r);salvarEstado();
+  if(db) db.ref('painel/recebe').set({vendedorId,valor,ts:Date.now(),id:r.id}); // dispara comemoracao de recebimento nas TVs
+  if(inp)inp.value='';
+  renderAdmin();
+  const vd=getVend(vendedorId);toast('💰 Recebimento de '+fmtBRL(valor)+' — '+(vd?vd.nome:''));
+}
+function delRecebimento(id){recebimentos=recebimentos.filter(r=>r.id!==id);salvarEstado();renderAdmin();}
 iniciar();renderAdmin();
 </script>
 </body>
