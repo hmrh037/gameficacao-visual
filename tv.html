@@ -12,7 +12,7 @@
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Satoshi','Inter','Segoe UI',system-ui,Arial,sans-serif;}
   :root{--bg:#0f111a;--bg2:#1e233a;--card:#161a2b;--border:rgba(255,255,255,.07);--text:#f1f5f9;--muted:#8b95a7;--gold:#d4af37;--green:#00d084;--red:#ff4757;}
   html,body{height:100%;background:radial-gradient(1300px 800px at 80% -15%, #1a2036, var(--bg));color:var(--text);overflow:hidden;}
-  .mono,.clock .hora,.idx-price,.idx-sub,.badge,.t-rank,.t-qtd,.t-rec,.linha .qtd,.gcol .gbar .gv,.valor-r,.forma-r,.ultra-banner .nm,.heroi .extra{font-family:'JetBrains Mono',ui-monospace,'Courier New',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
+  .mono,.t-rank,.t-qtd,.t-rec,.linha .qtd,.gcol .gbar .gv,.valor-r,.forma-r,.ultra-banner .nm{font-family:'JetBrains Mono',ui-monospace,'Courier New',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
   ::-webkit-scrollbar{width:8px;height:8px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:#2d3748;border-radius:4px;}
@@ -28,10 +28,6 @@
   .brand h1{font-size:2.5vh;font-weight:900;letter-spacing:1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
   .brand .sub{display:inline-flex;align-items:center;gap:.9vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
-  .navright{display:flex;align-items:center;gap:1.6vw;}
-  .clock{text-align:right;}
-  .clock .hora{font-size:2.9vh;font-weight:800;line-height:1;}
-  .clock .data{font-size:1.25vh;color:var(--muted);text-transform:capitalize;margin-top:.4vh;}
 
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.8vh 6vw 0;}
@@ -204,9 +200,6 @@
     <div class="brand"><span class="logo">🏆</span>
       <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking <span class="tag"><span class="pulse"></span>AO VIVO</span></div></div>
     </div>
-    <div class="navright">
-      <div class="clock"><div class="hora" id="hora">--:--</div><div class="data" id="data">—</div></div>
-    </div>
   </header>
   <section class="podio" id="podio"></section>
   <section class="corpo">
@@ -306,8 +299,6 @@ function noPeriodo(m){if(periodo==='tudo')return true;if(periodo==='hoje')return
 const getVend=id=>vendedores.find(v=>v.id===id);
 const getEq=id=>equipes.find(e=>e.id===id);
 const fotoEl=v=>v&&v.foto?`<img class="foto" src="${v.foto}"/>`:`<div class="foto">🧑‍💼</div>`;
-
-function tickRelogio(){const d=new Date();const h=document.getElementById('hora');if(h)h.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const dd=document.getElementById('data');if(dd)dd.textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});}
 
 function stats(){
   const mats=matriculas.filter(noPeriodo);const recs=recebimentos.filter(noPeriodo);const porVend={},porEq={};
@@ -581,7 +572,6 @@ function checarInatividade(){
 setInterval(checarInatividade,20000);
 
 function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();aplicarPlaylist();}
-setInterval(tickRelogio,1000);tickRelogio();
 setInterval(proximoSlide,7000);
 conectar();renderPainel();carregarPlaylists();
 </script>
