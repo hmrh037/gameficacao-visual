@@ -252,11 +252,10 @@ let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=tr
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
-let playlistData={},playQueue=[],playPos=0,playerAudio=null,playlistAtual=null,duckTimer=null;
+let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',musica:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
+let playlistData={},playerAudio=null,playlistAtual=null,musicaAtual='',duckTimer=null;
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
-let lastMusicaTs=0,primeiraMusica=true;
 
 // ---- Firebase ----
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
@@ -294,11 +293,6 @@ function conectar(){
     const c=snap.val(); if(!c||!c.ts) return;
     if(primeiroRecebe){primeiroRecebe=false;lastRecebeTs=c.ts;return;} // nao comemora ao abrir
     if(c.ts!==lastRecebeTs){lastRecebeTs=c.ts; celebrarRecebimento(c.vendedorId,c.valor,c.forma);}
-  });
-  db.ref('painel/tocarMusica').on('value',snap=>{
-    const m=snap.val(); if(!m||!m.ts) return;
-    if(primeiraMusica){primeiraMusica=false;lastMusicaTs=m.ts;return;} // nao toca ao abrir
-    if(m.ts!==lastMusicaTs){lastMusicaTs=m.ts; tocarMusicaEspecifica(m.arq);}
   });
 }
 // ---- util ----
@@ -517,37 +511,31 @@ function pararDinheiro(){try{if(somDinheiro){somDinheiro.pause();somDinheiro.cur
 function volMus(){return Math.max(0,Math.min(1,(config.volMusica==null?25:config.volMusica)/100));}
 function volCom(){return Math.max(0,Math.min(1,(config.volComemoracao==null?100:config.volComemoracao)/100));}
 function carregarPlaylists(){ fetch('playlists.json?t='+Date.now()).then(r=>r.json()).then(d=>{playlistData=d||{};aplicarPlaylist();}).catch(()=>{}); }
+// Sem play automatico: toca SOMENTE a musica escolhida no painel (config.musica), em repeticao.
 function aplicarPlaylist(){
-  const nome=config.playlist||'';
-  const mudou=(nome!==playlistAtual);
-  playlistAtual=nome;
-  if(mudou){playQueue=(playlistData[nome]||[]).slice();playPos=0;if(playerAudio)playerAudio.pause();mostrarMusica('');}
-  else if(!playQueue.length){playQueue=(playlistData[nome]||[]).slice();}
+  const pl=config.playlist||'', mus=config.musica||'';
+  playlistAtual=pl;
+  if(!mus){
+    if(musicaAtual){musicaAtual='';if(playerAudio)playerAudio.pause();mostrarMusica('');}
+  } else if(painelAtivo && mus!==musicaAtual){
+    musicaAtual=mus; tocarMusicaEspecifica(mus,pl);
+  }
   aplicarVolumes();
-  if(painelAtivo && playQueue.length && (!playerAudio||playerAudio.paused||mudou)) tocarProximaMusica();
 }
-function tocarProximaMusica(){
-  if(!painelAtivo||!playQueue.length){mostrarMusica('');return;}
-  if(playPos>=playQueue.length)playPos=0;
-  const arq=playQueue[playPos];
+// toca a musica escolhida no painel, em loop
+function tocarMusicaEspecifica(arq,playlist){
+  if(!arq||!painelAtivo)return;
+  const pl=playlist||playlistAtual||config.playlist||'';
+  musicaAtual=arq;
   if(!playerAudio){
     playerAudio=new Audio();
-    playerAudio.addEventListener('ended',()=>{playPos++;tocarProximaMusica();});
-    playerAudio.addEventListener('error',()=>{playPos++;setTimeout(tocarProximaMusica,600);});
+    playerAudio.addEventListener('error',()=>mostrarMusica(''));
   }
-  playerAudio.src='musicas/'+encodeURIComponent(playlistAtual)+'/'+encodeURIComponent(arq);
+  playerAudio.loop=true;
+  playerAudio.src='musicas/'+encodeURIComponent(pl)+'/'+encodeURIComponent(arq);
   playerAudio.volume=(duckTimer?volMus()*0.2:volMus());
   mostrarMusica(nomeLimpo(arq));
   playerAudio.play().catch(()=>{});
-}
-// toca uma musica especifica escolhida no painel e segue a playlist a partir dela
-function tocarMusicaEspecifica(arq){
-  if(!arq||!painelAtivo)return;
-  if(!playQueue.length)playQueue=(playlistData[playlistAtual]||[]).slice();
-  const idx=playQueue.indexOf(arq);
-  if(idx>=0)playPos=idx; else {playQueue.unshift(arq);playPos=0;}
-  if(playerAudio){playerAudio.pause();}
-  tocarProximaMusica();
 }
 function nomeLimpo(arq){
   let s=(arq||'').replace(/\.[^.]+$/,'');          // tira a extensao
