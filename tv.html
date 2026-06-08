@@ -131,7 +131,8 @@
   #iniciar .logo{font-size:11vh;background:linear-gradient(135deg,#d4af37,#f1c40f);width:18vh;height:18vh;display:flex;align-items:center;justify-content:center;border-radius:3vh;transform:rotate(3deg);box-shadow:0 12px 50px rgba(212,175,55,.5);}
   #iniciar h1{font-size:4vh;font-weight:900;letter-spacing:1px;}#iniciar h1 span{color:var(--gold);}
   #iniciar p{color:var(--muted);font-size:2vh;}
-  #iniciar button{background:linear-gradient(135deg,#d4af37,#f1c40f);color:#1a1300;border:none;border-radius:999px;padding:2vh 5vw;font-size:2.6vh;font-weight:900;box-shadow:0 0 50px rgba(212,175,55,.5);}
+  #iniciar button{background:linear-gradient(135deg,#d4af37,#f1c40f);color:#1a1300;border:none;border-radius:999px;padding:2vh 5vw;font-size:2.6vh;font-weight:900;box-shadow:0 0 50px rgba(212,175,55,.5);transition:transform .25s cubic-bezier(.2,1.4,.4,1),box-shadow .25s;}
+  #iniciar button:hover{transform:scale(1.1);box-shadow:0 0 75px rgba(212,175,55,.75);}
 
   #aviso{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:400;padding:6vw;text-align:center;}
   #aviso .box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:600px;}
@@ -200,7 +201,7 @@
 <div id="iniciar">
   <div class="logo">🏆</div>
   <h1>RANKING <span>GRUPO VISUAL</span></h1>
-  <button onclick="iniciarPainel()">▶ ABRIR PAINEL</button>
+  <button onclick="iniciarPainel()">ABRIR PAINEL</button>
 </div>
 
 <div id="painel" class="hidden">
