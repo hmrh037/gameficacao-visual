@@ -24,7 +24,8 @@
   /* NAV */
   .nav{display:flex;align-items:center;justify-content:space-between;gap:1.2vw;height:9.5vh;min-height:64px;padding:0 1.8vw;background:rgba(22,26,43,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
   .brand{display:flex;align-items:center;gap:1vw;}
-  .brand .logo{width:5.6vh;height:5.6vh;font-size:3vh;background:linear-gradient(135deg,#d4af37,#f1c40f);display:flex;align-items:center;justify-content:center;border-radius:1.2vh;transform:rotate(3deg);box-shadow:0 6px 20px rgba(212,175,55,.45);}
+  .brand .logo{width:5.6vh;height:5.6vh;font-size:3vh;display:flex;align-items:center;justify-content:center;}
+  .brand .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,.45));}
   .brand h1{font-size:2.5vh;font-weight:900;letter-spacing:1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
   .brand .sub{display:inline-flex;align-items:center;gap:.9vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
@@ -119,7 +120,8 @@
   @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,208,132,.7);transform:scale(1);}70%{box-shadow:0 0 0 1.5vh rgba(0,208,132,0);transform:scale(1.25);}100%{box-shadow:0 0 0 0 rgba(0,208,132,0);transform:scale(1);}}
 
   #iniciar{position:fixed;inset:0;background:radial-gradient(900px 600px at 50% 30%, #1a2036, var(--bg));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vh;z-index:200;text-align:center;padding:5vw;}
-  #iniciar .logo{font-size:11vh;background:linear-gradient(135deg,#d4af37,#f1c40f);width:18vh;height:18vh;display:flex;align-items:center;justify-content:center;border-radius:3vh;transform:rotate(3deg);box-shadow:0 12px 50px rgba(212,175,55,.5);}
+  #iniciar .logo{font-size:11vh;width:18vh;height:18vh;display:flex;align-items:center;justify-content:center;}
+  #iniciar .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 40px rgba(192,132,252,.55));}
   #iniciar h1{font-size:4vh;font-weight:900;letter-spacing:1px;}#iniciar h1 span{color:var(--gold);}
   #iniciar p{color:var(--muted);font-size:2vh;}
   #iniciar button{background:linear-gradient(135deg,#d4af37,#f1c40f);color:#1a1300;border:none;border-radius:999px;padding:2vh 5vw;font-size:2.6vh;font-weight:900;box-shadow:0 0 50px rgba(212,175,55,.5);transition:transform .25s cubic-bezier(.2,1.4,.4,1),box-shadow .25s;}
@@ -190,14 +192,14 @@
 </div></div>
 
 <div id="iniciar">
-  <div class="logo">🏆</div>
+  <div class="logo"><img src="tiers/unreal.png" alt="Unreal" onerror="this.replaceWith(document.createTextNode('🏆'))"/></div>
   <h1>RANKING <span>GRUPO VISUAL</span></h1>
   <button onclick="iniciarPainel()">ABRIR PAINEL</button>
 </div>
 
 <div id="painel" class="hidden">
   <header class="nav">
-    <div class="brand"><span class="logo">🏆</span>
+    <div class="brand"><span class="logo"><img src="tiers/unreal.png" alt="Unreal" onerror="this.replaceWith(document.createTextNode('🏆'))"/></span>
       <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking <span class="tag"><span class="pulse"></span>AO VIVO</span></div></div>
     </div>
   </header>
