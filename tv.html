@@ -142,6 +142,8 @@
   .escudo .shield{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;pointer-events:none;}
   .escudo .foto{position:absolute;inset:0;z-index:1;clip-path:polygon(50% 88%,16% 57%,17% 15%,50% 17%,83% 15%,84% 57%);display:flex;align-items:center;justify-content:center;font-size:15vh;overflow:hidden;}
   .escudo .foto img{width:100%;height:100%;object-fit:cover;}
+  .heroi .foto-m{width:32vh;height:32vh;border-radius:50%;margin:0 auto;overflow:hidden;border:.9vh solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15vh;background:#0008;box-shadow:0 0 60px rgba(212,175,55,.6);animation:pulsa 1.4s ease-in-out infinite;}
+  .heroi .foto-m img{width:100%;height:100%;object-fit:cover;}
   .heroi .titulo{margin-top:2.5vh;font-size:5.5vh;font-weight:900;color:var(--gold);text-shadow:0 4px 0 #00000060;letter-spacing:1px;animation:treme .5s ease-in-out 3;}
   @keyframes treme{0%,100%{transform:rotate(0);}25%{transform:rotate(-2deg);}75%{transform:rotate(2deg);}}
   .heroi .nome{font-size:6.5vh;font-weight:900;margin-top:.5vh;text-transform:uppercase;}
@@ -443,7 +445,7 @@ function celebrar(vendedorId){
   const conquista=marco?`<div class="conquista">🏅 MARCA DE ${qtdHoje} MATRÍCULAS HOJE!</div>`:'';
   const cel=document.getElementById('celebra');cel.classList.remove('hidden');
   cel.innerHTML=`<div class="raios"></div><div class="heroi">
-    <div class="escudo"><div class="foto">${v.foto?`<img src="${v.foto}"/>`:'🦸'}</div><img class="shield" src="${SHIELD_IMG}"/></div>
+    <div class="foto-m">${v.foto?`<img src="${v.foto}"/>`:'🦸'}</div>
     <div class="titulo">⚡ NOVA MATRÍCULA! ⚡</div><div class="nome">${v.nome}</div>
     <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
     <div class="extra">${qtdHoje}ª matrícula hoje — mandou bem! 🚀</div>${conquista}</div>`;
