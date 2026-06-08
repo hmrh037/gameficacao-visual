@@ -94,6 +94,22 @@
   </div>
 
   <div class="acard">
+    <h2>🎵 Música ambiente (playlist)</h2>
+    <div class="row" style="align-items:flex-end">
+      <div class="fld"><label>Playlist que toca nas TVs</label>
+        <select id="cfgPlaylist" onchange="setPlaylist(this.value)"><option value="">(nenhuma)</option></select>
+      </div>
+      <div class="fld"><label>🔉 Volume da música (ambiente) — <span id="volMusicaLbl">25%</span></label>
+        <input id="cfgVolMusica" type="range" min="0" max="100" step="1" oninput="setVolMusica(this.value)" style="width:220px"/>
+      </div>
+      <div class="fld"><label>🔊 Volume das comemorações — <span id="volComLbl">100%</span></label>
+        <input id="cfgVolCom" type="range" min="0" max="100" step="1" oninput="setVolCom(this.value)" style="width:220px"/>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:6px">A música da playlist toca <b>baixinho de fundo</b> nas TVs; as comemorações (matrícula, ultrapassagem, recebimento) tocam <b>mais alto</b> por cima. Para adicionar/trocar músicas, veja o <b>LEIA-ME.txt</b> dentro da pasta <b>musicas</b> e rode o <b>atualizar-musicas.bat</b>.</div>
+  </div>
+
+  <div class="acard">
     <h2>👥 Equipes</h2>
     <div id="equipesAdmin"></div>
   </div>
@@ -133,11 +149,14 @@
 <script>
 const uid=()=>Date.now()+Math.floor(Math.random()*100000);
 let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
-let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0};
+let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100};
 let db=null,pronto=false;
 function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarEstado();}
 function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarEstado();}
 function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarEstado();}
+function setPlaylist(v){config.playlist=v||'';salvarEstado();}
+function setVolMusica(v){config.volMusica=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volMusicaLbl').textContent=config.volMusica+'%';salvarEstado();}
+function setVolCom(v){config.volComemoracao=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volComLbl').textContent=config.volComemoracao+'%';salvarEstado();}
 
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
 // ---- autenticacao do gestor ----
@@ -145,7 +164,7 @@ function iniciar(){
   if(!cfgValida()){document.getElementById('aviso').style.display='flex';return;}
   if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
   firebase.auth().onAuthStateChanged(u=>{
-    if(u){ document.getElementById('login').style.display='none'; document.querySelector('.wrap').style.display='block'; conectar(); }
+    if(u){ document.getElementById('login').style.display='none'; document.querySelector('.wrap').style.display='block'; conectar(); carregarPlaylistsBase(); }
     else { document.getElementById('login').style.display='flex'; document.querySelector('.wrap').style.display='none'; }
   });
 }
@@ -224,6 +243,18 @@ function renderAdmin(){
   const ct=document.getElementById('cfgTempo');if(ct)ct.value=config.tempoCeleb||8;
   const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
   const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
+  const cp=document.getElementById('cfgPlaylist');if(cp&&document.activeElement!==cp)cp.value=config.playlist||'';
+  const vm=(config.volMusica==null?25:config.volMusica),vc=(config.volComemoracao==null?100:config.volComemoracao);
+  const evm=document.getElementById('cfgVolMusica');if(evm&&document.activeElement!==evm){evm.value=vm;document.getElementById('volMusicaLbl').textContent=vm+'%';}
+  const evc=document.getElementById('cfgVolCom');if(evc&&document.activeElement!==evc){evc.value=vc;document.getElementById('volComLbl').textContent=vc+'%';}
+}
+function carregarPlaylistsBase(){
+  fetch('playlists.json?t='+Date.now()).then(r=>r.json()).then(d=>{
+    const sel=document.getElementById('cfgPlaylist');if(!sel)return;
+    const nomes=Object.keys(d||{});
+    sel.innerHTML='<option value="">(nenhuma)</option>'+nomes.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">${n} (${(d[n]||[]).length} música(s))</option>`).join('');
+    sel.value=config.playlist||'';
+  }).catch(()=>{});
 }
 function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEstado();renderAdmin();}}
 const PALETA=["#2563eb","#ef4444","#22c55e","#a855f7","#f59e0b","#ec4899","#06b6d4","#84cc16"];

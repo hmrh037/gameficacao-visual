@@ -1,0 +1,38 @@
+==================================================================
+  MUSICAS / PLAYLISTS DO PAINEL  (musica ambiente nas TVs)
+==================================================================
+
+COMO FUNCIONA
+-------------
+- Cada PASTA aqui dentro e uma PLAYLIST. O NOME DA PASTA e o nome da playlist.
+- Coloque os arquivos de musica (.mp3) dentro da pasta da playlist.
+- Exemplo:
+    musicas\Equipe Alpha\musica1.mp3
+    musicas\Equipe Alpha\musica2.mp3
+    musicas\Equipe Omega\rock.mp3
+
+- Na BASE (base.html), em "Musica ambiente", voce ESCOLHE qual playlist toca
+  nas TVs e ajusta os volumes.
+
+- Se voce mudar o nome de uma equipe, e quiser que a playlist tenha o mesmo
+  nome, basta RENOMEAR a pasta aqui (e atualizar - ver abaixo).
+
+DEPOIS DE ADICIONAR / TROCAR MUSICAS (importante!)
+--------------------------------------------------
+As TVs estao na internet, entao as musicas precisam ser PUBLICADAS.
+Faca UMA destas opcoes:
+
+  OPCAO 1 (facil): de 2 cliques no arquivo  "atualizar-musicas.bat"
+                   (fica na pasta principal do sistema). Ele publica tudo.
+
+  OPCAO 2: me avise ("atualizei as musicas") que eu publico para voce.
+
+Depois, RECARREGUE as TVs (Ctrl+F5) para pegarem a playlist nova.
+
+DICAS
+-----
+- Prefira arquivos .mp3 (tocam em qualquer navegador de TV).
+- Mantenha as playlists com tamanho razoavel (musicas ocupam espaco).
+- O nome do arquivo aparece no rodape da TV enquanto toca
+  (ex.: "minha_musica.mp3" aparece como "minha musica").
+==================================================================
