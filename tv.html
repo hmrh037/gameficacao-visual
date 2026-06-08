@@ -256,6 +256,7 @@ let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=nul
 let playlistData={},playQueue=[],playPos=0,playerAudio=null,playlistAtual=null,duckTimer=null;
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
+let lastMusicaTs=0,primeiraMusica=true;
 
 // ---- Firebase ----
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
@@ -294,6 +295,11 @@ function conectar(){
     if(primeiroRecebe){primeiroRecebe=false;lastRecebeTs=c.ts;return;} // nao comemora ao abrir
     if(c.ts!==lastRecebeTs){lastRecebeTs=c.ts; celebrarRecebimento(c.vendedorId,c.valor,c.forma);}
   });
+  db.ref('painel/tocarMusica').on('value',snap=>{
+    const m=snap.val(); if(!m||!m.ts) return;
+    if(primeiraMusica){primeiraMusica=false;lastMusicaTs=m.ts;return;} // nao toca ao abrir
+    if(m.ts!==lastMusicaTs){lastMusicaTs=m.ts; tocarMusicaEspecifica(m.arq);}
+  });
 }
 // ---- util ----
 const fmtBRL=n=>(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -317,12 +323,12 @@ function iniciais(n){return (n||'').trim().split(/\s+/).map(p=>p[0]||'').slice(0
 function renderRanking(){
   const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);const max=Math.max(1,...arr.map(a=>a.qtd));
   const el=document.getElementById('ranking');
-  const resto=arr.slice(3,11); // 4o em diante (Top 3 fica no podio)
-  if(!resto.length){el.innerHTML='<div class="vazio">O Top 3 está no pódio acima 🏆<br>As demais colocações aparecem aqui.</div>';return;}
+  const resto=arr; // todos os vendedores, do 1o lugar em diante
+  if(!resto.length){el.innerHTML='<div class="vazio">Nenhuma colocação no período ainda.</div>';return;}
   el.innerHTML=resto.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow" data-vid="${a.v.id}">
-      <span class="t-rank">${i+4}</span>
+      <span class="t-rank">${i+1}</span>
       <span class="t-vend">${medalHTML(totalGeralVend(a.v.id),'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec">${fmtBRL(a.valor)}</span>
@@ -533,6 +539,15 @@ function tocarProximaMusica(){
   playerAudio.volume=(duckTimer?volMus()*0.2:volMus());
   mostrarMusica(nomeLimpo(arq));
   playerAudio.play().catch(()=>{});
+}
+// toca uma musica especifica escolhida no painel e segue a playlist a partir dela
+function tocarMusicaEspecifica(arq){
+  if(!arq||!painelAtivo)return;
+  if(!playQueue.length)playQueue=(playlistData[playlistAtual]||[]).slice();
+  const idx=playQueue.indexOf(arq);
+  if(idx>=0)playPos=idx; else {playQueue.unshift(arq);playPos=0;}
+  if(playerAudio){playerAudio.pause();}
+  tocarProximaMusica();
 }
 function nomeLimpo(arq){
   let s=(arq||'').replace(/\.[^.]+$/,'');          // tira a extensao
