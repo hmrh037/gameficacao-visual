@@ -56,7 +56,9 @@
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.8vh 6vw 0;}
   .pod{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;}
-  .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;}
+  .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;display:flex;align-items:center;justify-content:center;}
+  .medal-pod{width:6vh;height:6vh;object-fit:contain;font-size:2.4vh;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
+  .pod-1 .medal-pod{width:7.5vh;height:7.5vh;}
   .pod-av{width:13vh;height:13vh;border-radius:2.2vh;overflow:hidden;border:.4vh solid var(--pc,#888);display:flex;align-items:center;justify-content:center;font-size:7vh;background:#0008;box-shadow:0 10px 30px rgba(0,0,0,.45);}
   .pod-av img{width:100%;height:100%;object-fit:cover;}
   .pod-nm{font-weight:800;font-size:2vh;margin-top:.8vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
@@ -460,7 +462,7 @@ function renderPodio(){
     const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
     return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
-      <div class="pod-med">${med[pos]}</div>
+      <div class="pod-med">${medalHTML(totalGeralVend(a.v.id),'medal-pod')||med[pos]}</div>
       <div class="pod-av">${foto}</div>
       <div class="pod-nm">${a.v.nome}</div>
       <div class="pod-eq" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
