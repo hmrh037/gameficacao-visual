@@ -4,23 +4,33 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>BASE — Controle de Vendas (Grupo Visual)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,Arial,sans-serif;}
-  :root{--bg:#0b1020;--bg2:#141b33;--card:#1a2342;--border:#2a3658;--text:#f1f5f9;--muted:#94a3b8;--gold:#fbbf24;--green:#22c55e;}
-  body{background:var(--bg);color:var(--text);min-height:100vh;padding:24px;}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Satoshi','Inter','Segoe UI',system-ui,Arial,sans-serif;}
+  :root{--bg:#0f111a;--bg2:#1e233a;--card:#161a2b;--border:rgba(255,255,255,.06);--text:#f1f5f9;--muted:#8b95a7;--gold:#d4af37;--green:#00d084;--red:#ef4444;}
+  body{background:radial-gradient(1100px 600px at 50% -10%, #1a2036, var(--bg));color:var(--text);min-height:100vh;padding:24px;}
+  .sn,.step .rv,input[type=number]{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#2d3748;border-radius:4px;}
   .wrap{max-width:1000px;margin:0 auto;}
   h1{font-size:24px;font-weight:900;}h1 span{color:var(--gold);}
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
   .status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
   .dot{width:10px;height:10px;border-radius:50%;background:#ef4444;}.dot.on{background:var(--green);}
   .hint{color:var(--muted);font-size:13px;margin-bottom:18px;}
-  .acard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px;}
+  .acard{background:linear-gradient(180deg,#1a1f33,var(--card));border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 6px 24px rgba(0,0,0,.25);}
   .acard h2{font-size:16px;color:var(--gold);margin-bottom:12px;}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
   .fld{display:flex;flex-direction:column;gap:4px;}
   .fld label{font-size:12px;color:var(--muted);}
   input,select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;}
-  .btn{background:var(--gold);color:#1a1300;border:none;border-radius:8px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;}
+  .btn{background:linear-gradient(135deg,#d4af37,#f1c40f);color:#1a1300;border:none;border-radius:8px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s,filter .2s;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn:not(.sec):not(.red):hover{box-shadow:0 6px 18px rgba(212,175,55,.35);}
   .btn.sec{background:transparent;border:1px solid var(--border);color:var(--text);}
   .btn.red{background:#ef4444;color:#fff;}
   table{width:100%;border-collapse:collapse;margin-top:8px;}
