@@ -367,7 +367,7 @@ function renderRanking(){
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow" data-vid="${a.v.id}">
       <span class="t-rank">${i+1}</span>
-      <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span>${medalHTML(totalGeralVend(a.v.id),'medal-r')}</span>
+      <span class="t-vend">${medalHTML(totalGeralVend(a.v.id),'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec">${fmtBRL(a.valor)}</span>
       <span class="t-bar"><i style="width:${a.qtd/max*100}%;background:${eq.cor}"></i></span>
@@ -419,8 +419,7 @@ const SLIDES=[
   {t:'🥇 Ranking de Vendas',f:slideRankVendas},
   {t:'💰 Gráfico de Recebimentos',f:slideGraficoReceb},
   {t:'🏆 Ranking de Recebimentos',f:slideRankReceb},
-  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes},
-  {t:'🏅 Ligas dos Vendedores',f:slideLigas}
+  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes}
 ];
 let slideIdx=0;
 function renderSlide(){
