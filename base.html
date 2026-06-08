@@ -144,11 +144,6 @@
   <div class="acard">
     <h2>🗑 Matrículas lançadas</h2>
     <div id="listaMat" style="max-height:240px;overflow:auto"></div>
-    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn sec" onclick="testarUltra()">🏎️ Testar ultrapassagem nas TVs</button>
-      <button class="btn sec" onclick="tocarGrilo()">🦗 Tocar grilo nas TVs</button>
-      <button class="btn red" onclick="zerarMatriculas()">Zerar todas as matrículas</button>
-    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -290,15 +285,6 @@ function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vended
 function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();}
 function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const mx=400;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.8));};img.src=e.target.result;};r.readAsDataURL(file);}
 function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarMatriculas();renderAdmin();}
-function zerarMatriculas(){if(confirm('Apagar TODAS as matrículas?')){matriculas=[];salvarMatriculas();renderAdmin();}}
-function testarUltra(){
-  if(vendedores.length<2){alert('Cadastre pelo menos 2 vendedores para testar a ultrapassagem.');return;}
-  const cnt={};vendedores.forEach(v=>cnt[v.id]=0);matriculas.forEach(m=>{if(cnt[m.vendedorId]!=null)cnt[m.vendedorId]++;});
-  const ord=[...vendedores].sort((a,b)=>(cnt[b.id]||0)-(cnt[a.id]||0)).map(v=>v.id);
-  if(db) db.ref('painel/testeultra').set({xId:ord[1],yId:ord[0],ts:Date.now()});
-  toast('🏎️ Teste de ultrapassagem enviado às TVs');
-}
-function tocarGrilo(){if(db)db.ref('painel/grilo').set({ts:Date.now()});toast('🦗 Grilo enviado às TVs');}
 function addMat(vendedorId,delta){
   if(delta>0){ lancarUmaMat(vendedorId); }
   else { // remove a matrícula mais recente de hoje
