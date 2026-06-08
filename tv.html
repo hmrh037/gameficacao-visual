@@ -516,7 +516,13 @@ function tocarProximaMusica(){
   mostrarMusica(nomeLimpo(arq));
   playerAudio.play().catch(()=>{});
 }
-function nomeLimpo(arq){return (arq||'').replace(/\.[^.]+$/,'').replace(/_+/g,' ').trim();}
+function nomeLimpo(arq){
+  let s=(arq||'').replace(/\.[^.]+$/,'');          // tira a extensao
+  s=s.replace(/^YTDown[_\s-]*YouTube[_\s-]*/i,''); // tira prefixo do baixador (YTDown_YouTube_)
+  s=s.replace(/[_\s-]Media[_\s-].*$/i,'');         // tira o lixo final (_Media_<id>_009_128k)
+  s=s.replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+  return s||arq;
+}
 function mostrarMusica(txt){const el=document.getElementById('agora');if(!el)return;el.textContent=txt?('🎵 '+txt):'';el.style.opacity=txt?'1':'0';}
 function aplicarVolumes(){
   if(playerAudio && !duckTimer) playerAudio.volume=volMus();
