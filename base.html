@@ -205,9 +205,10 @@ function renderAdmin(){
         </div>
       </div>
       <div class="lc">
-        <span class="lcl">💰 Recebimento (R$)</span>
+        <span class="lcl">💰 Recebimento (forma + valor)</span>
         <div class="step">
-          <input class="rv" id="rv${v.id}" type="text" inputmode="decimal" placeholder="0,00" onkeydown="if(event.key==='Enter')addRecebimento(${v.id})"/>
+          <select class="rf" id="rf${v.id}"><option>Cartão</option><option>À vista</option><option>Boleto</option><option>PIX</option></select>
+          <input class="rv" id="rv${v.id}" type="text" inputmode="decimal" placeholder="R$ 0,00" onkeydown="if(event.key==='Enter')addRecebimento(${v.id})"/>
           <button class="btn" style="padding:9px 14px;white-space:nowrap" onclick="addRecebimento(${v.id})">💰 Receber</button>
         </div>
         <span class="lcl" style="margin-top:2px">Hoje: ${recHoje(v.id)} recebimento(s) · ${fmtBRL(recTotHoje(v.id))}</span>
@@ -219,7 +220,7 @@ function renderAdmin(){
   const ms=[...matriculas].sort((a,b)=>b.id-a.id).slice(0,40);
   document.getElementById('listaMat').innerHTML=ms.length?ms.map(m=>{const v=getVend(m.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — ${new Date(m.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delMatricula(${m.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhuma matrícula lançada ainda.</div>';
   const rs=[...recebimentos].sort((a,b)=>b.id-a.id).slice(0,40);
-  const lr=document.getElementById('listaReceb');if(lr)lr.innerHTML=rs.length?rs.map(r=>{const v=getVend(r.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — <b style="color:var(--green)">${fmtBRL(r.valor)}</b> — ${new Date(r.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delRecebimento(${r.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhum recebimento lançado ainda.</div>';
+  const lr=document.getElementById('listaReceb');if(lr)lr.innerHTML=rs.length?rs.map(r=>{const v=getVend(r.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — <b style="color:var(--green)">${fmtBRL(r.valor)}</b> <span class="chip" style="background:#22c55e22;color:#86efac">${r.forma||'—'}</span> — ${new Date(r.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delRecebimento(${r.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhum recebimento lançado ainda.</div>';
   const ct=document.getElementById('cfgTempo');if(ct)ct.value=config.tempoCeleb||8;
   const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
   const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
@@ -281,16 +282,18 @@ function setMat(vendedorId,val){
 }
 function addRecebimento(vendedorId){
   const inp=document.getElementById('rv'+vendedorId);
+  const sel=document.getElementById('rf'+vendedorId);
+  const forma=(sel&&sel.value)||'Cartão';
   let v=((inp&&inp.value)||'').trim();
   if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');
   const valor=Math.max(0,parseFloat(v)||0);
   if(valor<=0){alert('Informe o valor do recebimento.');return;}
-  const r={id:uid(),vendedorId,valor,data:hojeStr(),dt:Date.now()};
+  const r={id:uid(),vendedorId,valor,forma,data:hojeStr(),dt:Date.now()};
   recebimentos.push(r);salvarEstado();
-  if(db) db.ref('painel/recebe').set({vendedorId,valor,ts:Date.now(),id:r.id}); // dispara comemoracao de recebimento nas TVs
+  if(db) db.ref('painel/recebe').set({vendedorId,valor,forma,ts:Date.now(),id:r.id}); // dispara comemoracao de recebimento nas TVs
   if(inp)inp.value='';
   renderAdmin();
-  const vd=getVend(vendedorId);toast('💰 Recebimento de '+fmtBRL(valor)+' — '+(vd?vd.nome:''));
+  const vd=getVend(vendedorId);toast('💰 '+forma+' de '+fmtBRL(valor)+' — '+(vd?vd.nome:''));
 }
 function delRecebimento(id){recebimentos=recebimentos.filter(r=>r.id!==id);salvarEstado();renderAdmin();}
 iniciar();renderAdmin();
