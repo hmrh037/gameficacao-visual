@@ -27,7 +27,7 @@
   .brand .logo{width:5.6vh;height:5.6vh;font-size:3vh;background:linear-gradient(135deg,#d4af37,#f1c40f);display:flex;align-items:center;justify-content:center;border-radius:1.2vh;transform:rotate(3deg);box-shadow:0 6px 20px rgba(212,175,55,.45);}
   .brand h1{font-size:2.5vh;font-weight:900;letter-spacing:1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
-  .brand .sub{font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.5vh;}
+  .brand .sub{display:inline-flex;align-items:center;gap:.9vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
   .filtros{display:flex;gap:1.8vw;}
   .filtros button{background:none;border:none;color:var(--muted);font-size:1.7vh;font-weight:700;padding:.6vh .2vw;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
   .filtros button.on{color:var(--text);border-bottom-color:var(--gold);}
@@ -234,7 +234,7 @@
 <div id="painel" class="hidden">
   <header class="nav">
     <div class="brand"><span class="logo">🏆</span>
-      <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking</div></div>
+      <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking <span class="tag"><span class="pulse"></span>AO VIVO</span></div></div>
     </div>
     <div class="navright">
       <div class="clock"><div class="hora" id="hora">--:--</div><div class="data" id="data">—</div></div>
@@ -243,7 +243,7 @@
   <section class="podio" id="podio"></section>
   <section class="corpo">
     <div class="card">
-      <div class="cardhead"><h2>📋 Colocações</h2><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
+      <div class="cardhead"><h2>📋 Colocações</h2></div>
       <div class="thead"><span>#</span><span>Vendedor</span><span class="r">Matr.</span><span class="r">Receita</span><span>Progresso</span></div>
       <div class="ranking" id="ranking"></div>
     </div>
