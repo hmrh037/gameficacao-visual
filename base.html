@@ -162,13 +162,13 @@ const uid=()=>Date.now()+Math.floor(Math.random()*100000);
 let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
 let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
 let db=null,pronto=false;
-function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarEstado();}
-function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarEstado();}
-function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarEstado();}
-function setPeriodo(v){config.periodo=v||'hoje';salvarEstado();}
-function setPlaylist(v){config.playlist=v||'';salvarEstado();}
-function setVolMusica(v){config.volMusica=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volMusicaLbl').textContent=config.volMusica+'%';salvarEstado();}
-function setVolCom(v){config.volComemoracao=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volComLbl').textContent=config.volComemoracao+'%';salvarEstado();}
+function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarConfig();}
+function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarConfig();}
+function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarConfig();}
+function setPeriodo(v){config.periodo=v||'hoje';salvarConfig();}
+function setPlaylist(v){config.playlist=v||'';salvarConfig();}
+function setVolMusica(v){config.volMusica=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volMusicaLbl').textContent=config.volMusica+'%';salvarConfig();}
+function setVolCom(v){config.volComemoracao=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volComLbl').textContent=config.volComemoracao+'%';salvarConfig();}
 
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
 // ---- autenticacao do gestor ----
@@ -204,6 +204,12 @@ function conectar(){
 }
 function setStatus(on){document.getElementById('dot').classList.toggle('on',on);document.getElementById('statusTxt').textContent=on?'conectado — TVs recebendo':'sem conexão';}
 function salvarEstado(){ if(db) db.ref('painel/estado').set({equipes,vendedores,matriculas,recebimentos,config}); }
+// Escritas por filho: cada ação grava só a parte que mudou (não reenvia as fotos dos vendedores a cada matrícula).
+function salvarMatriculas(){ if(db) db.ref('painel/estado/matriculas').set(matriculas); }
+function salvarRecebimentos(){ if(db) db.ref('painel/estado/recebimentos').set(recebimentos); }
+function salvarVendedores(){ if(db) db.ref('painel/estado/vendedores').set(vendedores); }
+function salvarEquipes(){ if(db) db.ref('painel/estado/equipes').set(equipes); }
+function salvarConfig(){ if(db) db.ref('painel/estado/config').set(config); }
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
 
 const getEq=id=>equipes.find(e=>e.id===id);
@@ -269,22 +275,22 @@ function carregarPlaylistsBase(){
     sel.value=config.playlist||'';
   }).catch(()=>{});
 }
-function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEstado();renderAdmin();}}
+function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEquipes();renderAdmin();}}
 const PALETA=["#2563eb","#ef4444","#22c55e","#a855f7","#f59e0b","#ec4899","#06b6d4","#84cc16"];
-function addEquipe(){const cor=PALETA[equipes.length%PALETA.length];equipes.push({id:uid(),nome:'Equipe '+(equipes.length+1),cor,meta:0});salvarEstado();renderAdmin();toast('Equipe adicionada');}
-function delEquipe(id){if(equipes.length<=1){alert('É preciso ter pelo menos uma equipe.');return;}const temVend=vendedores.some(v=>v.equipeId===id);if(temVend&&!confirm('Esta equipe tem vendedores. Remover mesmo assim? (os vendedores ficarão sem equipe)')) return;else if(!temVend&&!confirm('Remover esta equipe?'))return;equipes=equipes.filter(e=>e.id!==id);salvarEstado();renderAdmin();}
+function addEquipe(){const cor=PALETA[equipes.length%PALETA.length];equipes.push({id:uid(),nome:'Equipe '+(equipes.length+1),cor,meta:0});salvarEquipes();renderAdmin();toast('Equipe adicionada');}
+function delEquipe(id){if(equipes.length<=1){alert('É preciso ter pelo menos uma equipe.');return;}const temVend=vendedores.some(v=>v.equipeId===id);if(temVend&&!confirm('Esta equipe tem vendedores. Remover mesmo assim? (os vendedores ficarão sem equipe)')) return;else if(!temVend&&!confirm('Remover esta equipe?'))return;equipes=equipes.filter(e=>e.id!==id);salvarEquipes();renderAdmin();}
 function addVendedor(){
   const nome=document.getElementById('vNome').value.trim();if(!nome){alert('Informe o nome.');return;}
   const equipeId=Number(document.getElementById('vEquipe').value)||equipes[0].id;
   const file=document.getElementById('vFoto').files[0];
-  const fin=foto=>{vendedores.push({id:uid(),nome,equipeId,foto:foto||''});salvarEstado();document.getElementById('vNome').value='';document.getElementById('vFoto').value='';renderAdmin();toast('Vendedor adicionado');};
+  const fin=foto=>{vendedores.push({id:uid(),nome,equipeId,foto:foto||''});salvarVendedores();document.getElementById('vNome').value='';document.getElementById('vFoto').value='';renderAdmin();toast('Vendedor adicionado');};
   if(file)comprimir(file,fin);else fin('');
 }
-function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vendedores.filter(v=>v.id!==id);salvarEstado();renderAdmin();}}
-function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarEstado();renderAdmin();toast('Foto atualizada');}});};inp.click();}
+function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vendedores.filter(v=>v.id!==id);salvarVendedores();renderAdmin();}}
+function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();}
 function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const mx=400;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.8));};img.src=e.target.result;};r.readAsDataURL(file);}
-function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarEstado();renderAdmin();}
-function zerarMatriculas(){if(confirm('Apagar TODAS as matrículas?')){matriculas=[];salvarEstado();renderAdmin();}}
+function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarMatriculas();renderAdmin();}
+function zerarMatriculas(){if(confirm('Apagar TODAS as matrículas?')){matriculas=[];salvarMatriculas();renderAdmin();}}
 function testarUltra(){
   if(vendedores.length<2){alert('Cadastre pelo menos 2 vendedores para testar a ultrapassagem.');return;}
   const cnt={};vendedores.forEach(v=>cnt[v.id]=0);matriculas.forEach(m=>{if(cnt[m.vendedorId]!=null)cnt[m.vendedorId]++;});
@@ -298,12 +304,12 @@ function addMat(vendedorId,delta){
   else { // remove a matrícula mais recente de hoje
     const hoje=hojeStr();
     const mine=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hoje).sort((a,b)=>b.dt-a.dt);
-    if(mine[0]){ matriculas=matriculas.filter(m=>m.id!==mine[0].id); salvarEstado(); renderAdmin(); }
+    if(mine[0]){ matriculas=matriculas.filter(m=>m.id!==mine[0].id); salvarMatriculas(); renderAdmin(); }
   }
 }
 function lancarUmaMat(vendedorId){
   const m={id:uid(),vendedorId,valor:Number(config.valorMatricula)||0,data:hojeStr(),dt:Date.now()};
-  matriculas.push(m);salvarEstado();
+  matriculas.push(m);salvarMatriculas();
   if(db) db.ref('painel/celebra').set({vendedorId,ts:Date.now(),id:m.id}); // dispara comemoracao nas TVs
   renderAdmin();
   const v=getVend(vendedorId);toast('🎉 Matrícula lançada para '+(v?v.nome:''));
@@ -314,13 +320,13 @@ function setMat(vendedorId,val){
   if(diff>0){
     let last=null;
     for(let i=0;i<diff;i++){const m={id:uid()+i,vendedorId,valor:Number(config.valorMatricula)||0,data:hoje,dt:Date.now()+i};matriculas.push(m);last=m;}
-    salvarEstado();
+    salvarMatriculas();
     if(db&&last) db.ref('painel/celebra').set({vendedorId,ts:Date.now(),id:last.id});
   } else if(diff<0){
     const mine=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hoje).sort((a,b)=>b.dt-a.dt);
     const rem=mine.slice(0,-diff).map(m=>m.id);
     matriculas=matriculas.filter(m=>rem.indexOf(m.id)<0);
-    salvarEstado();
+    salvarMatriculas();
   }
   renderAdmin();
 }
@@ -333,13 +339,13 @@ function addRecebimento(vendedorId){
   const valor=Math.max(0,parseFloat(v)||0);
   if(valor<=0){alert('Informe o valor do recebimento.');return;}
   const r={id:uid(),vendedorId,valor,forma,data:hojeStr(),dt:Date.now()};
-  recebimentos.push(r);salvarEstado();
+  recebimentos.push(r);salvarRecebimentos();
   if(db) db.ref('painel/recebe').set({vendedorId,valor,forma,ts:Date.now(),id:r.id}); // dispara comemoracao de recebimento nas TVs
   if(inp)inp.value='';
   renderAdmin();
   const vd=getVend(vendedorId);toast('💰 '+forma+' de '+fmtBRL(valor)+' — '+(vd?vd.nome:''));
 }
-function delRecebimento(id){recebimentos=recebimentos.filter(r=>r.id!==id);salvarEstado();renderAdmin();}
+function delRecebimento(id){recebimentos=recebimentos.filter(r=>r.id!==id);salvarRecebimentos();renderAdmin();}
 iniciar();renderAdmin();
 </script>
 </body>

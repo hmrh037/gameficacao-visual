@@ -24,16 +24,16 @@ ONDE AS MEDALHAS APARECEM
 
 A liga e definida pelo TOTAL GERAL de matriculas (acumulado).
 
-LIMITES (quantas matriculas para cada liga) - PADRAO ATUAL:
+LIMITES (total geral de matriculas para cada liga) - ATUAL:
   Bronze .... a partir de 1
-  Silver .... a partir de 10
-  Gold ...... a partir de 25
-  Platinum .. a partir de 50
-  Diamond ... a partir de 90
-  Elite ..... a partir de 150
-  Champion .. a partir de 230
-  Unreal .... a partir de 350
-(Esses numeros sao um ponto de partida - me avise se quiser mudar.)
+  Silver .... a partir de 2
+  Gold ...... a partir de 3
+  Platinum .. a partir de 4
+  Diamond ... a partir de 5
+  Elite ..... a partir de 6
+  Champion .. a partir de 7
+  Unreal .... a partir de 8
+(Hoje cada matricula sobe uma liga. Me avise se quiser limites maiores.)
 
 DEPOIS DE COLOCAR AS IMAGENS (importante!)
 ------------------------------------------
