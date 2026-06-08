@@ -411,7 +411,8 @@ function slideEquipes(){
 function slideLigas(){
   const cont=TIERS.map(()=>0);
   vendedores.forEach(v=>{const i=tierIdx(totalGeralVend(v.id));if(i>=0)cont[i]++;});
-  return '<div class="ladder">'+TIERS.map((t,i)=>`<div class="lad"><div class="lad-medal"><img class="medal-l" src="${t.img}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/></div><div class="lad-nm" style="color:${t.cor}">${t.nome}</div><div class="lad-ct">${cont[i]}</div></div>`).join('')+'</div>';
+  const ordem=TIERS.map((t,i)=>({t,n:cont[i]})).reverse(); // mais forte primeiro, Bronze por ultimo
+  return '<div class="ladder">'+ordem.map(({t,n})=>`<div class="lad"><div class="lad-medal"><img class="medal-l" src="${t.img}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/></div><div class="lad-nm" style="color:${t.cor}">${t.nome}</div><div class="lad-ct">${n}</div></div>`).join('')+'</div>';
 }
 const SLIDES=[
   {t:'📊 Gráfico de Vendas',f:slideGraficoVendas},
