@@ -37,6 +37,15 @@
   .corpo{flex:1;display:grid;grid-template-columns:1.15fr .85fr;gap:1.2vw;min-height:0;}
   .painelcard{background:var(--card);border:1px solid var(--border);border-radius:1.4vh;padding:1.2vh 1.2vw;display:flex;flex-direction:column;min-height:0;}
   .painelcard h2{font-size:2vh;font-weight:800;margin-bottom:1vh;display:flex;align-items:center;gap:.6vw;color:var(--gold);}
+  .slidehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1vh;}
+  .slidehead h2{margin-bottom:0;}
+  .slidedots{display:flex;gap:.7vh;}
+  .slidedots i{width:1.1vh;height:1.1vh;border-radius:50%;background:var(--border);transition:background .3s;}
+  .slidedots i.on{background:var(--gold);}
+  .slidebox{flex:1;display:flex;flex-direction:column;min-height:0;}
+  .slidebox>.grafico,.slidebox>.ranking{flex:1;}
+  .slidebox.fadein{animation:slideFade .5s ease;}
+  @keyframes slideFade{from{opacity:0;transform:translateY(1.4vh);}to{opacity:1;transform:translateY(0);}}
   .ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.8vh;}
   .linha{display:flex;align-items:center;gap:1vw;background:var(--bg2);border:1px solid var(--border);border-radius:1.1vh;padding:.7vh 1vw;}
   .linha .pos{font-size:2.6vh;font-weight:900;width:4.5vh;text-align:center;}
@@ -153,7 +162,7 @@
   <div class="equipes" id="equipes"></div>
   <div class="corpo">
     <div class="painelcard"><h2>🥇 Ranking dos Vendedores</h2><div class="ranking" id="ranking"></div></div>
-    <div class="painelcard"><h2>📊 Gráfico de Vendas</h2><div class="grafico" id="grafico"></div></div>
+    <div class="painelcard"><div class="slidehead"><h2 id="slideTitulo">📊 Gráfico de Vendas</h2><div class="slidedots" id="slideDots"></div></div><div class="slidebox" id="slideBox"></div></div>
   </div>
 </div>
 
@@ -230,10 +239,11 @@ const fotoEl=v=>v&&v.foto?`<img class="foto" src="${v.foto}"/>`:`<div class="fot
 function tickRelogio(){const d=new Date();const h=document.getElementById('hora');if(h)h.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const dd=document.getElementById('data');if(dd)dd.textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});}
 
 function stats(){
-  const mats=matriculas.filter(noPeriodo);const porVend={},porEq={};
-  vendedores.forEach(v=>porVend[v.id]={v,qtd:0,valor:0});
-  equipes.forEach(e=>porEq[e.id]={e,qtd:0,valor:0});
+  const mats=matriculas.filter(noPeriodo);const recs=recebimentos.filter(noPeriodo);const porVend={},porEq={};
+  vendedores.forEach(v=>porVend[v.id]={v,qtd:0,valor:0,rec:0,recQtd:0});
+  equipes.forEach(e=>porEq[e.id]={e,qtd:0,valor:0,rec:0,recQtd:0});
   mats.forEach(m=>{if(porVend[m.vendedorId]){porVend[m.vendedorId].qtd++;porVend[m.vendedorId].valor+=Number(m.valor)||0;}const v=getVend(m.vendedorId);if(v&&porEq[v.equipeId]){porEq[v.equipeId].qtd++;porEq[v.equipeId].valor+=Number(m.valor)||0;}});
+  recs.forEach(r=>{if(porVend[r.vendedorId]){porVend[r.vendedorId].rec+=Number(r.valor)||0;porVend[r.vendedorId].recQtd++;}const v=getVend(r.vendedorId);if(v&&porEq[v.equipeId]){porEq[v.equipeId].rec+=Number(r.valor)||0;porEq[v.equipeId].recQtd++;}});
   return {porVend,porEq};
 }
 function eqCard(a){
@@ -262,13 +272,59 @@ function renderRanking(){
   const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
   el.innerHTML=arr.slice(0,7).map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha" data-vid="${a.v.id}"><div class="pos">${medal(i)}</div>${fotoEl(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${a.qtd/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.qtd}<small>${fmtBRL(a.valor)}</small></div></div>`;}).join('');
 }
-function renderGrafico(){
+const medalha=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
+function fotoMini(v){return v&&v.foto?`<img class="foto" src="${v.foto}"/>`:`<div class="foto">🧑‍💼</div>`;}
+function colBar(foto,nome,altPct,cor,label){return `<div class="gcol"><div class="gbar" style="height:${altPct}%;background:linear-gradient(${cor},${cor}99)"><span class="gv">${label}</span></div>${foto?`<img class="gfoto" src="${foto}"/>`:`<div class="gfoto">🧑‍💼</div>`}<div class="gnm">${(nome||'').split(' ')[0]}</div></div>`;}
+// --- slides do painel rotativo ---
+function slideGraficoVendas(){
   const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd).slice(0,6);const max=Math.max(1,...arr.map(a=>a.qtd));
-  const el=document.getElementById('grafico');
-  if(!arr.length){el.innerHTML='<div class="vazio">Sem matrículas no período.</div>';return;}
-  el.innerHTML=arr.map(a=>{const eq=getEq(a.v.equipeId)||{cor:'#888'};return `<div class="gcol"><div class="gbar" style="height:${a.qtd/max*100}%;background:linear-gradient(${eq.cor},${eq.cor}99)"><span class="gv">${a.qtd}</span></div>${a.v.foto?`<img class="gfoto" src="${a.v.foto}"/>`:`<div class="gfoto">🧑‍💼</div>`}<div class="gnm">${(a.v.nome||'').split(' ')[0]}</div></div>`;}).join('');
+  if(!arr.length)return '<div class="vazio">Sem matrículas no período.</div>';
+  return '<div class="grafico">'+arr.map(a=>{const eq=getEq(a.v.equipeId)||{cor:'#888'};return colBar(a.v.foto,a.v.nome,a.qtd/max*100,eq.cor,a.qtd);}).join('')+'</div>';
 }
-function renderPainel(){renderEquipes();renderRanking();renderGrafico();}
+function slideGraficoReceb(){
+  const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.rec>0).sort((a,b)=>b.rec-a.rec).slice(0,6);const max=Math.max(1,...arr.map(a=>a.rec));
+  if(!arr.length)return '<div class="vazio">Sem recebimentos no período.</div>';
+  return '<div class="grafico">'+arr.map(a=>colBar(a.v.foto,a.v.nome,a.rec/max*100,'#22c55e','<span style="font-size:1.4vh">'+fmtBRL(a.rec)+'</span>')).join('')+'</div>';
+}
+function slideRankVendas(){
+  const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor).slice(0,6);const max=Math.max(1,...arr.map(a=>a.qtd));
+  if(!arr.length)return '<div class="vazio">Sem vendas no período.</div>';
+  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${a.qtd/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.qtd}</div></div>`;}).join('')+'</div>';
+}
+function slideRankReceb(){
+  const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.rec>0).sort((a,b)=>b.rec-a.rec).slice(0,6);const max=Math.max(1,...arr.map(a=>a.rec));
+  if(!arr.length)return '<div class="vazio">Sem recebimentos no período.</div>';
+  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${a.rec/max*100}%;background:#22c55e"></i></div><div class="qtd" style="font-size:2vh;width:auto">${fmtBRL(a.rec)}</div></div>`;}).join('')+'</div>';
+}
+function slideEquipes(){
+  const {porEq}=stats();const arr=equipes.map(e=>porEq[e.id]||{e,qtd:0,valor:0,rec:0});if(!arr.length)return '<div class="vazio">Cadastre as equipes.</div>';
+  const maxQ=Math.max(1,...arr.map(a=>a.qtd));const ord=[...arr].sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
+  return '<div class="ranking">'+ord.map((a,i)=>`<div class="linha" style="flex-direction:column;align-items:stretch;gap:.7vh">
+    <div style="display:flex;align-items:center;gap:1vw">
+      <div class="pos" style="width:auto">${i===0?'👑':(i+1)+'º'}</div>
+      <div class="nm" style="color:${a.e.cor};flex:1;font-size:2.3vh">🛡️ ${a.e.nome}</div>
+      <div style="text-align:right;font-size:1.7vh;font-weight:700"><span style="color:var(--gold)">${a.qtd}</span> matr. · <span style="color:var(--green)">${fmtBRL(a.rec)}</span></div>
+    </div>
+    <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
+}
+const SLIDES=[
+  {t:'📊 Gráfico de Vendas',f:slideGraficoVendas},
+  {t:'🥇 Ranking de Vendas',f:slideRankVendas},
+  {t:'💰 Gráfico de Recebimentos',f:slideGraficoReceb},
+  {t:'🏆 Ranking de Recebimentos',f:slideRankReceb},
+  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes}
+];
+let slideIdx=0;
+function renderSlide(){
+  const box=document.getElementById('slideBox');if(!box)return;
+  const s=SLIDES[slideIdx%SLIDES.length];
+  const tit=document.getElementById('slideTitulo');if(tit)tit.textContent=s.t;
+  box.innerHTML=s.f();
+  box.classList.remove('fadein');void box.offsetWidth;box.classList.add('fadein');
+  const dots=document.getElementById('slideDots');if(dots)dots.innerHTML=SLIDES.map((x,i)=>`<i class="${i===slideIdx%SLIDES.length?'on':''}"></i>`).join('');
+}
+function proximoSlide(){slideIdx=(slideIdx+1)%SLIDES.length;renderSlide();}
+function renderPainel(){renderEquipes();renderRanking();renderSlide();}
 
 // ---- ultrapassagem no ranking ----
 let ultraTimer=null;
@@ -378,6 +434,7 @@ function toggleFull(){if(document.fullscreenElement)document.exitFullscreen();el
 document.getElementById('filtros').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;periodo=b.dataset.p;document.querySelectorAll('#filtros button').forEach(x=>x.classList.toggle('on',x===b));renderPainel();rebaseOrder();});
 
 setInterval(tickRelogio,1000);tickRelogio();
+setInterval(proximoSlide,7000);
 conectar();renderPainel();
 </script>
 </body>
