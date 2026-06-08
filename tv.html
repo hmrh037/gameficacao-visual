@@ -101,6 +101,7 @@
   .t-nm{flex:1;font-size:1.95vh;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .medal-r{width:4.4vh;height:4.4vh;object-fit:contain;flex-shrink:0;font-size:1.8vh;}
   .medal-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;border-radius:50%;line-height:1;}
+  .medal-none{filter:grayscale(1) brightness(.7) opacity(.45);}
   .ladder{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vh .6vw;align-content:center;padding:1vh 0;}
   .lad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;}
   .medal-l{width:8.5vh;height:8.5vh;object-fit:contain;font-size:3.6vh;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
@@ -285,7 +286,7 @@ const TIERS=[
 function tierIdx(total){let idx=-1;for(let i=0;i<TIERS.length;i++){if(total>=TIERS[i].min)idx=i;}return idx;}
 function totalGeralVend(id){return matriculas.filter(m=>m.vendedorId===id).length;}
 function medalFallback(img,nome,cor){const s=document.createElement('span');s.className=img.className+' medal-fb';s.textContent=(nome||'?').charAt(0);s.style.background=cor;s.title=nome||'';img.replaceWith(s);}
-function medalHTML(total,cls){const i=tierIdx(total);if(i<0)return '';const t=TIERS[i];return `<img class="${cls}" src="${t.img}" title="${t.nome}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/>`;}
+function medalHTML(total,cls){const i=tierIdx(total);if(i<0)return `<img class="${cls} medal-none" src="tiers/bronze.png" title="Sem liga ainda"/>`;const t=TIERS[i];return `<img class="${cls}" src="${t.img}" title="${t.nome}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/>`;}
 let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=true;
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
