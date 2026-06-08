@@ -56,28 +56,27 @@
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.8vh 6vw 0;}
   .pod{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;}
-  .pod-top{position:relative;display:flex;align-items:center;justify-content:center;}
-  .laurel{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:205%;height:auto;z-index:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45));}
-  .pod-av{position:relative;z-index:1;width:12vh;height:12vh;border-radius:2.2vh;overflow:hidden;border:.4vh solid var(--pc,#888);display:flex;align-items:center;justify-content:center;font-size:6.5vh;background:#0008;box-shadow:0 10px 30px rgba(0,0,0,.45);}
+  .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;display:flex;align-items:center;justify-content:center;}
+  .medal-pod{width:6vh;height:6vh;object-fit:contain;font-size:2.4vh;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
+  .pod-1 .medal-pod{width:7.5vh;height:7.5vh;}
+  .pod-av{width:13vh;height:13vh;border-radius:2.2vh;overflow:hidden;border:.4vh solid var(--pc,#888);display:flex;align-items:center;justify-content:center;font-size:7vh;background:#0008;box-shadow:0 10px 30px rgba(0,0,0,.45);}
   .pod-av img{width:100%;height:100%;object-fit:cover;}
-  .pod-nm{font-weight:800;font-size:2vh;margin-top:1vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .pod-nm{font-weight:800;font-size:2vh;margin-top:.8vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .pod-eq{font-size:1.35vh;font-weight:700;}
-  /* pedestal = cilindro metálico 3D */
-  .pedestal{position:relative;margin-top:1.6vh;width:88%;border-radius:.5vh .5vh 1.4vh 1.4vh;padding:2.6vh .6vw 1.2vh;display:flex;flex-direction:column;align-items:center;gap:.15vh;box-shadow:0 14px 28px rgba(0,0,0,.55);}
-  .pedestal::before{content:"";position:absolute;left:0;right:0;top:-1.6vh;height:3.2vh;border-radius:50%;background:var(--cyl-top,#bbb);box-shadow:inset 0 .35vh .7vh rgba(255,255,255,.6), 0 .3vh .5vh rgba(0,0,0,.3);}
-  .pedestal>*{position:relative;z-index:1;}
-  .pod-pos{font-size:1.6vh;font-weight:900;color:rgba(0,0,0,.55);letter-spacing:1px;}
-  .pod-pts{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:3vh;font-weight:900;line-height:1;color:#1a1300;text-shadow:0 1px 0 rgba(255,255,255,.3);}
-  .pod-pts span{display:block;font-family:'Satoshi','Inter',sans-serif;font-size:1.1vh;font-weight:800;color:rgba(0,0,0,.55);letter-spacing:.5px;text-transform:uppercase;margin-top:.2vh;}
-  .pod-prize{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:1.75vh;font-weight:900;color:#06351a;background:rgba(255,255,255,.45);border-radius:.7vh;padding:.1vh .9vw;margin-top:.5vh;}
-  .pod-1 .pedestal{--cyl-top:#fbe6a0;background:linear-gradient(180deg,#f4d96b,#d4af37,#a9831f);min-height:18vh;}
-  .pod-2 .pedestal{--cyl-top:#f4f7fb;background:linear-gradient(180deg,#e8eef6,#cbd5e1,#98a4b4);min-height:13vh;}
-  .pod-3 .pedestal{--cyl-top:#f4cfa2;background:linear-gradient(180deg,#e9b478,#cd7f32,#995d26);min-height:10.5vh;}
-  .pod-1 .pod-av{width:15vh;height:15vh;border-radius:2.6vh;box-shadow:0 0 45px rgba(212,175,55,.45);}
+  .pedestal{margin-top:1vh;width:100%;background:linear-gradient(180deg,#1f2540,var(--card));border:1px solid var(--border);border-top:.4vh solid var(--pc,#888);border-radius:1.2vh 1.2vh 0 0;padding:1vh .6vw .8vh;display:flex;flex-direction:column;align-items:center;gap:.2vh;}
+  .pod-pos{font-size:1.4vh;font-weight:900;color:var(--pc,#888);letter-spacing:1px;}
+  .pod-pts{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:3vh;font-weight:900;line-height:1;}
+  .pod-pts span{display:block;font-family:'Satoshi','Inter',sans-serif;font-size:1.1vh;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:.2vh;}
+  .pod-prize{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:1.9vh;font-weight:800;color:var(--green);margin-top:.5vh;}
+  .pod-1 .pod-av{width:17vh;height:17vh;border-radius:2.8vh;box-shadow:0 0 45px rgba(212,175,55,.45);}
   .pod-1 .pod-nm{font-size:2.5vh;}
+  .pod-1 .pod-med{font-size:4vh;}
   .pod-1 .pod-pts{font-size:4vh;}
-  .pod-vazio .pedestal{--cyl-top:#313a55;background:linear-gradient(180deg,#2a3149,#1a2036);min-height:10vh;}
-  .pod-vazio{opacity:.6;}
+  .pod-1 .pedestal{min-height:16vh;background:linear-gradient(180deg,rgba(212,175,55,.18),var(--card));}
+  .pod-2 .pedestal{min-height:11vh;}
+  .pod-3 .pedestal{min-height:9vh;}
+  .pod-vazio{opacity:.3;}
+  .pod-vazio .pedestal{min-height:9vh;}
 
   /* CORPO */
   .corpo{flex:1;display:grid;grid-template-columns:1.25fr .75fr;gap:1.2vw;padding:.8vh 1.8vw 1.2vh;min-height:0;}
@@ -287,10 +286,6 @@ const TIERS=[
 function tierIdx(total){let idx=-1;for(let i=0;i<TIERS.length;i++){if(total>=TIERS[i].min)idx=i;}return idx;}
 function totalGeralVend(id){return matriculas.filter(m=>m.vendedorId===id).length;}
 function medalFallback(img,nome,cor){const s=document.createElement('span');s.className=img.className+' medal-fb';s.textContent=(nome||'?').charAt(0);s.style.background=cor;s.title=nome||'';img.replaceWith(s);}
-function laurel(cor){
-  function lado(a0,a1){let s='';const n=7;for(let i=0;i<n;i++){const t=a0+(a1-a0)*i/(n-1);const r=t*Math.PI/180;const x=60+46*Math.cos(r),y=64+46*Math.sin(r);const ry=3.4+i*0.65,rx=ry+3.6;const rot=t+(a1>a0?112:68);s+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${rot.toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;}return s;}
-  return `<svg class="laurel" viewBox="0 0 120 114" fill="${cor}">${lado(94,186)}${lado(86,-6)}</svg>`;
-}
 function medalHTML(total,cls){const i=tierIdx(total);if(i<0)return `<img class="${cls} medal-none" src="tiers/bronze.png" title="Sem liga ainda"/>`;const t=TIERS[i];return `<img class="${cls}" src="${t.img}" title="${t.nome}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/>`;}
 let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=true;
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
@@ -468,7 +463,8 @@ function renderPodio(){
     const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
     return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
-      <div class="pod-top">${laurel(cor[pos])}<div class="pod-av">${foto}</div></div>
+      <div class="pod-med">${medalHTML(totalGeralVend(a.v.id),'medal-pod')||med[pos]}</div>
+      <div class="pod-av">${foto}</div>
       <div class="pod-nm">${a.v.nome}</div>
       <div class="pod-eq" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
       <div class="pedestal">
