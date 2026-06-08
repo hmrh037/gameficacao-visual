@@ -6,12 +6,11 @@
 <title>TV — Painel de Vendas Grupo Visual</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Satoshi','Inter','Segoe UI',system-ui,Arial,sans-serif;}
-  :root{--bg:#0f111a;--bg2:#1e233a;--card:#161a2b;--border:rgba(255,255,255,.07);--text:#f1f5f9;--muted:#8b95a7;--gold:#d4af37;--green:#00d084;--red:#ff4757;}
-  html,body{height:100%;background:radial-gradient(1300px 800px at 80% -15%, #1a2036, var(--bg));color:var(--text);overflow:hidden;}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Space Grotesk','Segoe UI',system-ui,Arial,sans-serif;}
+  :root{--bg:#0a0a0a;--bg2:#0c0c0c;--card:rgba(255,255,255,.03);--border:rgba(255,255,255,.1);--text:#ebebeb;--muted:rgba(235,235,235,.55);--gold:#ccff00;--green:#10b981;--red:#ff4757;}
+  html,body{height:100%;background:#000;color:var(--text);overflow:hidden;}
   .mono,.clock .hora,.idx-price,.idx-sub,.badge,.t-rank,.t-qtd,.t-rec,.linha .qtd,.gcol .gbar .gv,.valor-r,.forma-r,.ultra-banner .nm,.heroi .extra{font-family:'JetBrains Mono',ui-monospace,'Courier New',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
   ::-webkit-scrollbar{width:8px;height:8px;}
   ::-webkit-scrollbar-track{background:transparent;}
@@ -19,13 +18,17 @@
   button{font-family:inherit;cursor:pointer;}
   .hidden{display:none!important;}
 
-  /* ---------- ESTRUTURA ---------- */
-  #painel{height:100vh;display:flex;flex-direction:column;}
+  /* ---------- ESTRUTURA (shell flutuante) ---------- */
+  #painel{position:relative;height:calc(100vh - 2.4vh);margin:1.2vh 1vw;border-radius:2.5rem;border:1px solid rgba(255,255,255,.1);background:#0c0c0c;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.7);}
+  #painel::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:60px 60px;}
+  #painel::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(560px 380px at 10% -5%, rgba(204,255,0,.12), transparent 60%),radial-gradient(640px 460px at 105% 108%, rgba(16,185,129,.12), transparent 60%);}
+  #painel>*{position:relative;z-index:1;}
+  #painel>.noise{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");}
   /* NAV */
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:1.2vw;height:9.5vh;min-height:64px;padding:0 1.8vw;background:rgba(22,26,43,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:1.2vw;height:9.5vh;min-height:64px;padding:0 1.8vw;background:rgba(255,255,255,.03);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.1);}
   .brand{display:flex;align-items:center;gap:1vw;}
-  .brand .logo{width:5.6vh;height:5.6vh;font-size:3vh;background:linear-gradient(135deg,#d4af37,#f1c40f);display:flex;align-items:center;justify-content:center;border-radius:1.2vh;transform:rotate(3deg);box-shadow:0 6px 20px rgba(212,175,55,.45);}
-  .brand h1{font-size:2.5vh;font-weight:900;letter-spacing:1px;line-height:1;}
+  .brand .logo{width:5.6vh;height:5.6vh;font-size:3vh;background:#ccff00;display:flex;align-items:center;justify-content:center;border-radius:1.4vh;box-shadow:0 0 30px rgba(204,255,0,.4);}
+  .brand h1{font-size:2.5vh;font-weight:700;letter-spacing:-1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
   .brand .sub{display:inline-flex;align-items:center;gap:.9vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
   .filtros{display:flex;gap:1.8vw;}
@@ -81,10 +84,10 @@
 
   /* CORPO */
   .corpo{flex:1;display:grid;grid-template-columns:1.25fr .75fr;gap:1.2vw;padding:.8vh 1.8vw 1.2vh;min-height:0;}
-  .card{background:linear-gradient(180deg,#1a1f33,var(--card));border:1px solid var(--border);border-radius:1.4vh;padding:1.4vh 1.3vw;display:flex;flex-direction:column;min-height:0;box-shadow:0 8px 30px rgba(0,0,0,.32);}
+  .card{background:rgba(255,255,255,.03);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:2rem;padding:1.6vh 1.4vw;display:flex;flex-direction:column;min-height:0;box-shadow:0 8px 30px rgba(0,0,0,.35);}
   .cardhead,.slidehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1vh;}
   .cardhead h2,.slidehead h2{font-size:1.9vh;font-weight:800;letter-spacing:.3px;color:var(--text);}
-  .tag{font-size:1.1vh;font-weight:800;color:var(--green);background:rgba(0,208,132,.12);border-radius:.5vh;padding:.35vh .8vw;letter-spacing:1.5px;display:flex;align-items:center;gap:.4vw;}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:1.1vh;font-weight:700;color:#ccff00;background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);border-radius:999px;padding:.35vh .9vw;letter-spacing:2px;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5vw;}
   .tag .pulse{width:.9vh;height:.9vh;}
 
   /* TABELA RANKING */
@@ -93,7 +96,7 @@
   .ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.5vh;margin-top:.6vh;}
   .trow{display:grid;grid-template-columns:4vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.7vh 1vw;border-radius:1vh;border:1px solid transparent;transition:background .2s,transform .2s;}
   .trow:nth-child(even){background:rgba(255,255,255,.018);}
-  .trow:first-child{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);border-color:rgba(212,175,55,.32);}
+  .trow:first-child{background:linear-gradient(90deg,rgba(204,255,0,.1),transparent);border-color:rgba(204,255,0,.3);}
   .t-rank{font-size:2vh;font-weight:900;color:var(--muted);text-align:center;}
   .trow:first-child .t-rank{color:var(--gold);}
   .t-vend{display:flex;align-items:center;gap:.8vw;min-width:0;}
@@ -145,8 +148,8 @@
   .statusbar b{color:var(--text);font-weight:700;}
   .sb-left{display:flex;align-items:center;gap:.6vw;}
   .nowplaying{position:absolute;left:50%;transform:translateX(-50%);text-align:center;color:var(--gold);font-weight:700;max-width:50vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .6s;}
-  .pulse{width:1.1vh;height:1.1vh;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 0 rgba(0,208,132,.6);animation:pulseRing 1.5s ease-in-out infinite;}
-  @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,208,132,.7);transform:scale(1);}70%{box-shadow:0 0 0 1.5vh rgba(0,208,132,0);transform:scale(1.25);}100%{box-shadow:0 0 0 0 rgba(0,208,132,0);transform:scale(1);}}
+  .pulse{width:.7vh;height:.7vh;border-radius:50%;background:#ccff00;display:inline-block;box-shadow:0 0 0 0 rgba(204,255,0,.6);animation:pulseRing 2s ease-in-out infinite;}
+  @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(204,255,0,.7);}70%{box-shadow:0 0 0 1.2vh rgba(204,255,0,0);}100%{box-shadow:0 0 0 0 rgba(204,255,0,0);}}
 
   .fab{position:fixed;bottom:4.4vh;right:1vw;z-index:50;}
   .fab button{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:50%;width:4.6vh;height:4.6vh;font-size:2vh;opacity:.4;transition:opacity .2s;}
@@ -252,6 +255,7 @@
       <div class="slidebox" id="slideBox"></div>
     </div>
   </section>
+  <div class="noise"></div>
 </div>
 
 <div id="celebra" class="hidden"></div>
