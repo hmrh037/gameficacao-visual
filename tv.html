@@ -471,15 +471,11 @@ function celebrar(vendedorId){
   const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#d4af37'};
   const qtdHoje=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hojeStr()).length;
   const marco=(qtdHoje>=5&&qtdHoje%5===0);
-  const conquista=marco?`<div class="conquista">🏅 MARCA DE ${qtdHoje} MATRÍCULAS HOJE!</div>`:'';
-  const liga=medalHTML(matriculas.filter(m=>m.vendedorId===vendedorId).length,'medal-c');
   const cel=document.getElementById('celebra');cel.classList.remove('hidden');
   cel.innerHTML=`<div class="raios"></div><div class="heroi">
     <div class="foto-m">${v.foto?`<img src="${v.foto}"/>`:'🦸'}</div>
     <div class="titulo">⚡ NOVA MATRÍCULA! ⚡</div><div class="nome">${v.nome}</div>
-    <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
-    ${liga?`<div class="cel-liga">${liga}</div>`:''}
-    <div class="extra">${qtdHoje}ª matrícula hoje — mandou bem! 🚀</div>${conquista}</div>`;
+    <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div></div>`;
   soltarBaloes(eq.cor);soltarConfete();if(marco)soltarConfete();tocarMatricula();
   clearTimeout(celebTimer);celebTimer=setTimeout(()=>cel.classList.add('hidden'),(config.tempoCeleb||8)*1000);
   cel.onclick=()=>cel.classList.add('hidden');
