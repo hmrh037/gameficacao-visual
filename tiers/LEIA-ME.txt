@@ -1,0 +1,47 @@
+==================================================================
+  MEDALHAS / LIGAS (TIERS) DO PAINEL
+==================================================================
+
+Coloque AQUI as 8 imagens das medalhas, com EXATAMENTE estes nomes
+(de preferencia PNG com fundo transparente):
+
+  bronze.png
+  silver.png
+  gold.png
+  platinum.png
+  diamond.png
+  elite.png
+  champion.png
+  unreal.png
+
+ONDE AS MEDALHAS APARECEM
+-------------------------
+- No RANKING: ao lado de cada vendedor (a liga atual dele).
+- No RODIZIO: um quadro "Ligas" mostrando as 8 ligas (fraco -> forte)
+  e quantos vendedores estao em cada uma.
+- Na COMEMORACAO de matricula: a medalha da liga atual do vendedor.
+(Nao ha aviso de "subiu de liga".)
+
+A liga e definida pelo TOTAL GERAL de matriculas (acumulado).
+
+LIMITES (quantas matriculas para cada liga) - PADRAO ATUAL:
+  Bronze .... a partir de 1
+  Silver .... a partir de 10
+  Gold ...... a partir de 25
+  Platinum .. a partir de 50
+  Diamond ... a partir de 90
+  Elite ..... a partir de 150
+  Champion .. a partir de 230
+  Unreal .... a partir de 350
+(Esses numeros sao um ponto de partida - me avise se quiser mudar.)
+
+DEPOIS DE COLOCAR AS IMAGENS (importante!)
+------------------------------------------
+As TVs estao na internet, entao as imagens precisam ser PUBLICADAS:
+  - de 2 cliques no  atualizar-musicas.bat  (publica tudo), ou
+  - me avise que eu publico.
+Depois recarregue as TVs (Ctrl+F5).
+
+Enquanto as imagens nao estiverem na pasta, aparece um circulo colorido
+com a inicial da liga (fallback).
+==================================================================

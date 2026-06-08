@@ -73,7 +73,14 @@
   .t-vend{display:flex;align-items:center;gap:.8vw;min-width:0;}
   .t-ic{width:4.8vh;height:4.8vh;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.7vh;color:#fff;overflow:hidden;background:#0008;}
   .t-ic img{width:100%;height:100%;object-fit:cover;}
-  .t-nm{font-size:1.95vh;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+  .t-nm{flex:1;font-size:1.95vh;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+  .medal-r{width:4.4vh;height:4.4vh;object-fit:contain;flex-shrink:0;font-size:1.8vh;}
+  .medal-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;border-radius:50%;line-height:1;}
+  .ladder{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vh .6vw;align-content:center;padding:1vh 0;}
+  .lad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;}
+  .medal-l{width:8.5vh;height:8.5vh;object-fit:contain;font-size:3.6vh;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
+  .lad-nm{font-size:1.4vh;font-weight:800;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+  .lad-ct{font-size:2.2vh;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--text);}
   .t-nm small{display:block;font-size:1.2vh;font-weight:700;}
   .t-qtd{font-size:2.5vh;font-weight:900;text-align:right;}
   .t-rec{font-size:1.55vh;color:var(--muted);text-align:right;}
@@ -144,6 +151,8 @@
   .escudo .foto img{width:100%;height:100%;object-fit:cover;}
   .heroi .foto-m{width:32vh;height:32vh;border-radius:50%;margin:0 auto;overflow:hidden;border:.9vh solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15vh;background:#0008;box-shadow:0 0 60px rgba(212,175,55,.6);animation:pulsa 1.4s ease-in-out infinite;}
   .heroi .foto-m img{width:100%;height:100%;object-fit:cover;}
+  .cel-liga{margin-top:1.2vh;}
+  .medal-c{width:9vh;height:9vh;object-fit:contain;font-size:4vh;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5));}
   .heroi .titulo{margin-top:2.5vh;font-size:5.5vh;font-weight:900;color:var(--gold);text-shadow:0 4px 0 #00000060;letter-spacing:1px;animation:treme .5s ease-in-out 3;}
   @keyframes treme{0%,100%{transform:rotate(0);}25%{transform:rotate(-2deg);}75%{transform:rotate(2deg);}}
   .heroi .nome{font-size:6.5vh;font-weight:900;margin-top:.5vh;text-transform:uppercase;}
@@ -244,6 +253,21 @@ const SOM_GRILO="grilo.mp3";
 const SOM_DINHEIRO="money.mp3";
 const SOM_MATRICULA="matricula.mp3";
 const FORMA_ICON={'Cartão':'💳','À vista':'💵','Boleto':'🧾','PIX':'⚡'};
+// Ligas (tiers) pelo TOTAL GERAL de matriculas — do mais fraco ao mais forte
+const TIERS=[
+  {nome:'Bronze',min:1,cor:'#cd7f32',img:'tiers/bronze.png'},
+  {nome:'Silver',min:10,cor:'#cbd5e1',img:'tiers/silver.png'},
+  {nome:'Gold',min:25,cor:'#d4af37',img:'tiers/gold.png'},
+  {nome:'Platinum',min:50,cor:'#5eead4',img:'tiers/platinum.png'},
+  {nome:'Diamond',min:90,cor:'#60a5fa',img:'tiers/diamond.png'},
+  {nome:'Elite',min:150,cor:'#a78bfa',img:'tiers/elite.png'},
+  {nome:'Champion',min:230,cor:'#fb923c',img:'tiers/champion.png'},
+  {nome:'Unreal',min:350,cor:'#c084fc',img:'tiers/unreal.png'}
+];
+function tierIdx(total){let idx=-1;for(let i=0;i<TIERS.length;i++){if(total>=TIERS[i].min)idx=i;}return idx;}
+function totalGeralVend(id){return matriculas.filter(m=>m.vendedorId===id).length;}
+function medalFallback(img,nome,cor){const s=document.createElement('span');s.className=img.className+' medal-fb';s.textContent=(nome||'?').charAt(0);s.style.background=cor;s.title=nome||'';img.replaceWith(s);}
+function medalHTML(total,cls){const i=tierIdx(total);if(i<0)return '';const t=TIERS[i];return `<img class="${cls}" src="${t.img}" title="${t.nome}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/>`;}
 let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=true;
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
@@ -343,7 +367,7 @@ function renderRanking(){
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow" data-vid="${a.v.id}">
       <span class="t-rank">${i+1}</span>
-      <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
+      <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span>${medalHTML(totalGeralVend(a.v.id),'medal-r')}</span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec">${fmtBRL(a.valor)}</span>
       <span class="t-bar"><i style="width:${a.qtd/max*100}%;background:${eq.cor}"></i></span>
@@ -384,12 +408,18 @@ function slideEquipes(){
     </div>
     <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
 }
+function slideLigas(){
+  const cont=TIERS.map(()=>0);
+  vendedores.forEach(v=>{const i=tierIdx(totalGeralVend(v.id));if(i>=0)cont[i]++;});
+  return '<div class="ladder">'+TIERS.map((t,i)=>`<div class="lad"><div class="lad-medal"><img class="medal-l" src="${t.img}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/></div><div class="lad-nm" style="color:${t.cor}">${t.nome}</div><div class="lad-ct">${cont[i]}</div></div>`).join('')+'</div>';
+}
 const SLIDES=[
   {t:'📊 Gráfico de Vendas',f:slideGraficoVendas},
   {t:'🥇 Ranking de Vendas',f:slideRankVendas},
   {t:'💰 Gráfico de Recebimentos',f:slideGraficoReceb},
   {t:'🏆 Ranking de Recebimentos',f:slideRankReceb},
-  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes}
+  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes},
+  {t:'🏅 Ligas dos Vendedores',f:slideLigas}
 ];
 let slideIdx=0;
 function renderSlide(){
@@ -442,11 +472,13 @@ function celebrar(vendedorId){
   const qtdHoje=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hojeStr()).length;
   const marco=(qtdHoje>=5&&qtdHoje%5===0);
   const conquista=marco?`<div class="conquista">🏅 MARCA DE ${qtdHoje} MATRÍCULAS HOJE!</div>`:'';
+  const liga=medalHTML(matriculas.filter(m=>m.vendedorId===vendedorId).length,'medal-c');
   const cel=document.getElementById('celebra');cel.classList.remove('hidden');
   cel.innerHTML=`<div class="raios"></div><div class="heroi">
     <div class="foto-m">${v.foto?`<img src="${v.foto}"/>`:'🦸'}</div>
     <div class="titulo">⚡ NOVA MATRÍCULA! ⚡</div><div class="nome">${v.nome}</div>
     <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
+    ${liga?`<div class="cel-liga">${liga}</div>`:''}
     <div class="extra">${qtdHoje}ª matrícula hoje — mandou bem! 🚀</div>${conquista}</div>`;
   soltarBaloes(eq.cor);soltarConfete();if(marco)soltarConfete();tocarMatricula();
   clearTimeout(celebTimer);celebTimer=setTimeout(()=>cel.classList.add('hidden'),(config.tempoCeleb||8)*1000);
