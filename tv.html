@@ -53,6 +53,29 @@
   .spark i.lead{opacity:1;}
   .idx.bateu{border-color:var(--green);box-shadow:0 0 26px rgba(0,208,132,.28);}
 
+  /* PÓDIO TOP 3 */
+  .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.8vh 6vw 0;}
+  .pod{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;}
+  .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;}
+  .pod-av{width:10vh;height:10vh;border-radius:1.6vh;overflow:hidden;border:.4vh solid var(--pc,#888);display:flex;align-items:center;justify-content:center;font-size:5.5vh;background:#0008;box-shadow:0 10px 30px rgba(0,0,0,.45);}
+  .pod-av img{width:100%;height:100%;object-fit:cover;}
+  .pod-nm{font-weight:800;font-size:2vh;margin-top:.8vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .pod-eq{font-size:1.35vh;font-weight:700;}
+  .pedestal{margin-top:1vh;width:100%;background:linear-gradient(180deg,#1f2540,var(--card));border:1px solid var(--border);border-top:.4vh solid var(--pc,#888);border-radius:1.2vh 1.2vh 0 0;padding:1vh .6vw .8vh;display:flex;flex-direction:column;align-items:center;gap:.2vh;}
+  .pod-pos{font-size:1.4vh;font-weight:900;color:var(--pc,#888);letter-spacing:1px;}
+  .pod-pts{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:3vh;font-weight:900;line-height:1;}
+  .pod-pts span{display:block;font-family:'Satoshi','Inter',sans-serif;font-size:1.1vh;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:.2vh;}
+  .pod-prize{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:1.9vh;font-weight:800;color:var(--green);margin-top:.5vh;}
+  .pod-1 .pod-av{width:13vh;height:13vh;box-shadow:0 0 45px rgba(212,175,55,.45);}
+  .pod-1 .pod-nm{font-size:2.5vh;}
+  .pod-1 .pod-med{font-size:4vh;}
+  .pod-1 .pod-pts{font-size:4vh;}
+  .pod-1 .pedestal{min-height:16vh;background:linear-gradient(180deg,rgba(212,175,55,.18),var(--card));}
+  .pod-2 .pedestal{min-height:11vh;}
+  .pod-3 .pedestal{min-height:9vh;}
+  .pod-vazio{opacity:.3;}
+  .pod-vazio .pedestal{min-height:9vh;}
+
   /* CORPO */
   .corpo{flex:1;display:grid;grid-template-columns:1.25fr .75fr;gap:1.2vw;padding:.8vh 1.8vw 1.2vh;min-height:0;}
   .card{background:linear-gradient(180deg,#1a1f33,var(--card));border:1px solid var(--border);border-radius:1.4vh;padding:1.4vh 1.3vw;display:flex;flex-direction:column;min-height:0;box-shadow:0 8px 30px rgba(0,0,0,.32);}
@@ -218,7 +241,7 @@
       <div class="clock"><div class="hora" id="hora">--:--</div><div class="data" id="data">—</div></div>
     </div>
   </header>
-  <section class="indices" id="equipes"></section>
+  <section class="podio" id="podio"></section>
   <section class="corpo">
     <div class="card">
       <div class="cardhead"><h2>📊 Ranking dos Vendedores</h2><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
@@ -424,7 +447,31 @@ function renderSlide(){
   const dots=document.getElementById('slideDots');if(dots)dots.innerHTML=SLIDES.map((x,i)=>`<i class="${i===slideIdx%SLIDES.length?'on':''}"></i>`).join('');
 }
 function proximoSlide(){slideIdx=(slideIdx+1)%SLIDES.length;renderSlide();}
-function renderPainel(){renderEquipes();renderRanking();renderSlide();}
+function renderPodio(){
+  const {porVend}=stats();
+  const arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);
+  const cont=document.getElementById('podio');if(!cont)return;
+  if(!arr.length){cont.innerHTML='<div class="vazio" style="width:100%">Aguardando dados da base...</div>';return;}
+  const med={1:'🥇',2:'🥈',3:'🥉'},cor={1:'#d4af37',2:'#cbd5e1',3:'#cd7f32'};
+  const ordem=[{a:arr[1],pos:2},{a:arr[0],pos:1},{a:arr[2],pos:3}]; // 2º à esquerda, 1º no centro, 3º à direita
+  cont.innerHTML=ordem.map(({a,pos})=>{
+    if(!a)return '<div class="pod pod-'+pos+' pod-vazio"><div class="pedestal"></div></div>';
+    const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
+    const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
+    return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
+      <div class="pod-med">${med[pos]}</div>
+      <div class="pod-av">${foto}</div>
+      <div class="pod-nm">${a.v.nome}</div>
+      <div class="pod-eq" style="color:${eq.cor}">🛡️ ${eq.nome}</div>
+      <div class="pedestal">
+        <div class="pod-pos">${pos}º</div>
+        <div class="pod-pts">${a.qtd}<span>matrículas</span></div>
+        <div class="pod-prize">${fmtBRL(a.rec)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderPainel(){renderPodio();renderRanking();renderSlide();}
 
 // ---- ultrapassagem no ranking ----
 let ultraTimer=null;
