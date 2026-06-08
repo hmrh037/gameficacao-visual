@@ -363,6 +363,13 @@ function slideEquipes(){
     </div>
     <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
 }
+// Resultado dos dias anteriores (numero manual por vendedor) — NAO entra no ranking/meta do dia
+function slideDiasAnteriores(){
+  let arr=vendedores.map(v=>({v,n:Number(v.vendasAnteriores)||0})).filter(a=>a.n>0).sort((a,b)=>b.n-a.n).slice(0,6);
+  if(!arr.length)return '<div class="vazio">Sem vendas de dias anteriores cadastradas no painel.</div>';
+  const max=Math.max(1,...arr.map(a=>a.n));
+  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${a.n/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.n}</div></div>`;}).join('')+'</div>';
+}
 function slideLigas(){
   const cont=TIERS.map(()=>0);
   vendedores.forEach(v=>{const i=tierIdx(totalGeralVend(v.id));if(i>=0)cont[i]++;});
@@ -374,7 +381,8 @@ const SLIDES=[
   {t:'🥇 Ranking de Vendas',f:slideRankVendas},
   {t:'💰 Gráfico de Recebimentos',f:slideGraficoReceb},
   {t:'🏆 Ranking de Recebimentos',f:slideRankReceb},
-  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes}
+  {t:'🛡️ Equipes — quem está na frente',f:slideEquipes},
+  {t:'📅 Resultado dos dias anteriores',f:slideDiasAnteriores}
 ];
 let slideIdx=0;
 function renderSlide(){
