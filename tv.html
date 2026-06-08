@@ -290,7 +290,7 @@ function conectar(){
     if(c.ts!==lastRecebeTs){lastRecebeTs=c.ts; celebrarRecebimento(c.vendedorId,c.valor,c.forma);}
   });
 }
-function setStatus(on){const t=document.getElementById('statusTxt'),d=document.getElementById('dot');d.classList.toggle('on',on);t.textContent=on?'conectado à base':'sem conexão';}
+function setStatus(on){const t=document.getElementById('statusTxt'),d=document.getElementById('dot');d.classList.toggle('on',on);t.textContent=on?'conectado':'sem conexão';}
 
 // ---- util ----
 const fmtBRL=n=>(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
