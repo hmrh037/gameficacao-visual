@@ -99,6 +99,7 @@
       <div class="fld"><label>Tempo da comemoração (segundos)</label><input id="cfgTempo" type="number" min="2" max="60" step="1" onchange="setTempoCeleb(this.value)"/></div>
       <div class="fld"><label>Valor da matrícula (R$)</label><input id="cfgValor" type="number" min="0" step="0.01" placeholder="0,00" onchange="setValorMat(this.value)"/></div>
       <div class="fld"><label>Alerta de inatividade (minutos)</label><input id="cfgInativ" type="number" min="0" max="240" step="1" placeholder="0 = desligado" onchange="setInatividade(this.value)"/></div>
+      <div class="fld"><label>Período exibido nas TVs</label><select id="cfgPeriodo" onchange="setPeriodo(this.value)"><option value="hoje">Hoje</option><option value="mes">Mês</option><option value="tudo">Geral</option></select></div>
     </div>
     <div class="hint" style="margin-top:6px">Tempo da comemoração nas TVs · Valor padrão somado a cada matrícula lançada · Inatividade: após X minutos sem vendas, as TVs tocam o 🦗 grilo (0 desliga).</div>
   </div>
@@ -159,11 +160,12 @@
 <script>
 const uid=()=>Date.now()+Math.floor(Math.random()*100000);
 let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
-let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100};
+let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
 let db=null,pronto=false;
 function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarEstado();}
 function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarEstado();}
 function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarEstado();}
+function setPeriodo(v){config.periodo=v||'hoje';salvarEstado();}
 function setPlaylist(v){config.playlist=v||'';salvarEstado();}
 function setVolMusica(v){config.volMusica=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volMusicaLbl').textContent=config.volMusica+'%';salvarEstado();}
 function setVolCom(v){config.volComemoracao=Math.max(0,Math.min(100,parseInt(v)||0));document.getElementById('volComLbl').textContent=config.volComemoracao+'%';salvarEstado();}
@@ -253,6 +255,7 @@ function renderAdmin(){
   const ct=document.getElementById('cfgTempo');if(ct)ct.value=config.tempoCeleb||8;
   const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
   const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
+  const cpd=document.getElementById('cfgPeriodo');if(cpd&&document.activeElement!==cpd)cpd.value=config.periodo||'hoje';
   const cp=document.getElementById('cfgPlaylist');if(cp&&document.activeElement!==cp)cp.value=config.playlist||'';
   const vm=(config.volMusica==null?25:config.volMusica),vc=(config.volComemoracao==null?100:config.volComemoracao);
   const evm=document.getElementById('cfgVolMusica');if(evm&&document.activeElement!==evm){evm.value=vm;document.getElementById('volMusicaLbl').textContent=vm+'%';}

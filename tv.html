@@ -32,6 +32,7 @@
   .filtros button{background:none;border:none;color:var(--muted);font-size:1.7vh;font-weight:700;padding:.6vh .2vw;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
   .filtros button.on{color:var(--text);border-bottom-color:var(--gold);}
   .filtros button:hover{color:var(--text);}
+  .periodo-label{font-size:1.7vh;font-weight:800;color:var(--gold);border:1px solid rgba(212,175,55,.5);background:rgba(212,175,55,.1);border-radius:999px;padding:.5vh 1.8vw;letter-spacing:.5px;}
   .navright{display:flex;align-items:center;gap:1.6vw;}
   .clock{text-align:right;}
   .clock .hora{font-size:2.9vh;font-weight:800;line-height:1;}
@@ -235,11 +236,7 @@
     <div class="brand"><span class="logo">🏆</span>
       <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking</div></div>
     </div>
-    <nav class="filtros" id="filtros">
-      <button data-p="hoje" class="on">Hoje</button>
-      <button data-p="mes">Mês</button>
-      <button data-p="tudo">Geral</button>
-    </nav>
+    <div class="periodo-label" id="periodoLabel">Hoje</div>
     <div class="navright">
       <div class="clock"><div class="hora" id="hora">--:--</div><div class="data" id="data">—</div></div>
     </div>
@@ -291,7 +288,7 @@ let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=tr
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100};
+let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,playlist:'',volMusica:25,volComemoracao:100,periodo:'hoje'};
 let playlistData={},playQueue=[],playPos=0,playerAudio=null,playlistAtual=null,duckTimer=null;
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
@@ -307,9 +304,10 @@ function conectar(){
     const d=snap.val()||{};
     equipes=d.equipes||[]; vendedores=d.vendedores||[]; matriculas=d.matriculas||[]; recebimentos=d.recebimentos||[];
     if(d.config)config={...config,...d.config};
+    const np=config.periodo||'hoje';const pmudou=np!==periodo;periodo=np;atualizarPeriodoLabel();
     aplicarPlaylist();aplicarVolumes();
     renderPainel();
-    checarUltra();
+    if(pmudou)rebaseOrder();else checarUltra();
   });
   db.ref('painel/celebra').on('value',snap=>{
     const c=snap.val(); if(!c||!c.ts) return;
@@ -643,7 +641,7 @@ setInterval(checarInatividade,20000);
 
 function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();aplicarPlaylist();}
 function toggleFull(){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}
-document.getElementById('filtros').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;periodo=b.dataset.p;document.querySelectorAll('#filtros button').forEach(x=>x.classList.toggle('on',x===b));renderPainel();rebaseOrder();});
+function atualizarPeriodoLabel(){const el=document.getElementById('periodoLabel');if(el)el.textContent=({hoje:'Hoje',mes:'Mês',tudo:'Geral'})[periodo]||'Hoje';}
 
 setInterval(tickRelogio,1000);tickRelogio();
 setInterval(proximoSlide,7000);
