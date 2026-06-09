@@ -22,9 +22,10 @@ ONDE AS MEDALHAS APARECEM
 - Na COMEMORACAO de matricula: a medalha da liga atual do vendedor.
 (Nao ha aviso de "subiu de liga".)
 
-A liga e definida pelo TOTAL GERAL de matriculas (acumulado).
+A liga e definida pelas matriculas DE HOJE (reseta a cada novo dia).
+Quem esta com 0 matriculas hoje fica "sem rank" (medalha apagada).
 
-LIMITES (total geral de matriculas para cada liga) - ATUAL:
+LIMITES (matriculas de hoje para cada liga) - ATUAL:
   Bronze .... a partir de 1
   Silver .... a partir de 2
   Gold ...... a partir de 3

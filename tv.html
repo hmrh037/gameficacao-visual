@@ -245,7 +245,6 @@ const TIERS=[
   {nome:'Unreal',min:8,cor:'#c084fc',img:'tiers/unreal.png'}
 ];
 function tierIdx(total){let idx=-1;for(let i=0;i<TIERS.length;i++){if(total>=TIERS[i].min)idx=i;}return idx;}
-function totalGeralVend(id){return matriculas.filter(m=>m.vendedorId===id).length;}
 function medalFallback(img,nome,cor){const s=document.createElement('span');s.className=img.className+' medal-fb';s.textContent=(nome||'?').charAt(0);s.style.background=cor;s.title=nome||'';img.replaceWith(s);}
 function medalHTML(total,cls){const i=tierIdx(total);if(i<0)return `<img class="${cls} medal-none" src="tiers/bronze.png" title="Sem liga ainda"/>`;const t=TIERS[i];return `<img class="${cls}" src="${t.img}" title="${t.nome}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/>`;}
 let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=true;
@@ -322,7 +321,7 @@ function renderRanking(){
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow" data-vid="${a.v.id}">
       <span class="t-rank">${i+1}</span>
-      <span class="t-vend">${medalHTML(totalGeralVend(a.v.id),'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
+      <span class="t-vend">${medalHTML(a.qtd,'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec">${fmtBRL(a.valor)}</span>
       <span class="t-bar"><i style="width:${a.qtd/max*100}%;background:${eq.cor}"></i></span>
@@ -372,8 +371,9 @@ function slideDiasAnteriores(){
   return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome} · ${a.ant} ant + ${a.hj} hoje</div></div><div class="barra"><i style="width:${a.total/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.total}</div></div>`;}).join('')+'</div>';
 }
 function slideLigas(){
+  const {porVend}=stats();
   const cont=TIERS.map(()=>0);
-  vendedores.forEach(v=>{const i=tierIdx(totalGeralVend(v.id));if(i>=0)cont[i]++;});
+  vendedores.forEach(v=>{const q=porVend[v.id]?porVend[v.id].qtd:0;const i=tierIdx(q);if(i>=0)cont[i]++;});
   const ordem=TIERS.map((t,i)=>({t,n:cont[i]})).reverse(); // mais forte primeiro, Bronze por ultimo
   return '<div class="ladder">'+ordem.map(({t,n})=>`<div class="lad"><div class="lad-medal"><img class="medal-l" src="${t.img}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/></div><div class="lad-nm" style="color:${t.cor}">${t.nome}</div><div class="lad-ct">${n}</div></div>`).join('')+'</div>';
 }
@@ -407,7 +407,7 @@ function renderPodio(){
     const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
     return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
-      <div class="pod-med">${medalHTML(totalGeralVend(a.v.id),'medal-pod')||med[pos]}</div>
+      <div class="pod-med">${medalHTML(a.qtd,'medal-pod')||med[pos]}</div>
       <div class="pod-av">${foto}</div>
       <div class="pod-nm">${a.v.nome}</div>
       <div class="pod-eq" style="color:${eq.cor}">${eq.nome}</div>
