@@ -34,10 +34,10 @@
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.1vh 6vw 0;}
   .pod{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;}
   .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;display:flex;align-items:center;justify-content:center;}
-  .medal-pod{width:4.5vh;height:4.5vh;object-fit:contain;font-size:2.4vh;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
-  .pod-1 .medal-pod{width:5.5vh;height:5.5vh;}
-  .pod-av{width:16vh;height:16vh;border-radius:2.6vh;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:8vh;background:transparent;}
-  .pod-av img{width:100%;height:100%;object-fit:cover;}
+  .medal-pod{width:6vh;height:6vh;object-fit:contain;font-size:2.4vh;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
+  .pod-1 .medal-pod{width:7.5vh;height:7.5vh;}
+  .pod-av{width:13vh;height:13vh;display:flex;align-items:center;justify-content:center;font-size:7vh;background:transparent;}
+  .pod-av img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 3px var(--pc,#888)) drop-shadow(0 0 10px var(--pc,#888));}
   .pod-nm{font-weight:800;font-size:2.3vh;margin-top:.8vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .pod-eq{font-size:1.55vh;font-weight:700;}
   .pedestal{margin-top:1vh;width:100%;background:linear-gradient(180deg,#1f2540,var(--card));border:1px solid var(--border);border-top:.4vh solid var(--pc,#888);border-radius:1.2vh 1.2vh 0 0;padding:1vh .6vw .8vh;display:flex;flex-direction:column;align-items:center;gap:.2vh;}
@@ -45,17 +45,15 @@
   .pod-pts{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:3.4vh;font-weight:900;line-height:1;}
   .pod-pts span{display:block;font-family:'Satoshi','Inter',sans-serif;font-size:1.25vh;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:.2vh;}
   .pod-prize{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:2.15vh;font-weight:800;color:var(--green);margin-top:.5vh;}
-  .pod-1 .pod-av{width:21vh;height:21vh;border-radius:3.2vh;box-shadow:0 0 45px rgba(212,175,55,.45);}
+  .pod-1 .pod-av{width:17vh;height:17vh;}
   .pod-1 .pod-nm{font-size:2.9vh;}
   .pod-1 .pod-med{font-size:4vh;}
   .pod-1 .pod-pts{font-size:4.5vh;}
-  .pod-1 .pedestal{min-height:10vh;background:linear-gradient(180deg,rgba(212,175,55,.18),var(--card));}
-  .pod-2 .pod-av{box-shadow:0 0 32px rgba(203,213,225,.42);}
-  .pod-2 .pedestal{min-height:7vh;background:linear-gradient(180deg,rgba(203,213,225,.16),var(--card));}
-  .pod-3 .pod-av{box-shadow:0 0 32px rgba(205,127,50,.42);}
-  .pod-3 .pedestal{min-height:6vh;background:linear-gradient(180deg,rgba(205,127,50,.16),var(--card));}
+  .pod-1 .pedestal{min-height:16vh;background:linear-gradient(180deg,rgba(212,175,55,.18),var(--card));}
+  .pod-2 .pedestal{min-height:11vh;background:linear-gradient(180deg,rgba(203,213,225,.16),var(--card));}
+  .pod-3 .pedestal{min-height:9vh;background:linear-gradient(180deg,rgba(205,127,50,.16),var(--card));}
   .pod-vazio{opacity:.3;}
-  .pod-vazio .pedestal{min-height:6vh;}
+  .pod-vazio .pedestal{min-height:9vh;}
 
   /* CORPO */
   .corpo{flex:1;display:grid;grid-template-columns:1.25fr .75fr;gap:1.2vw;padding:.5vh 1.8vw .8vh;min-height:0;}
