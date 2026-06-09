@@ -72,6 +72,11 @@
   .trow:first-child{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);border-color:rgba(212,175,55,.32);}
   .t-rank{font-size:2.4vh;font-weight:900;color:var(--muted);text-align:center;}
   .trow:first-child .t-rank{color:var(--gold);}
+  /* faixa + numero na cor da posicao tambem no 2o (prata) e 3o (bronze) */
+  .ranking .trow:nth-child(2){background:linear-gradient(90deg,rgba(203,213,225,.13),transparent);border-color:rgba(203,213,225,.32);}
+  .ranking .trow:nth-child(3){background:linear-gradient(90deg,rgba(205,127,50,.13),transparent);border-color:rgba(205,127,50,.32);}
+  .ranking .trow:nth-child(2) .t-rank{color:#cbd5e1;}
+  .ranking .trow:nth-child(3) .t-rank{color:#cd7f32;}
   .t-vend{display:flex;align-items:center;gap:.8vw;min-width:0;}
   .t-ic{width:5.4vh;height:5.4vh;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2vh;color:#fff;overflow:hidden;background:transparent;}
   .t-ic img{width:100%;height:100%;object-fit:cover;}
