@@ -278,6 +278,19 @@ function pedirAdmFoto(cb){_admFotoCb=cb;const m=document.getElementById('admFoto
 function fecharAdmFoto(){_admFotoCb=null;document.getElementById('admFoto').style.display='none';}
 function confirmarAdmFoto(){const u=(document.getElementById('admUser').value||'').trim();const s=document.getElementById('admPass').value||'';if(u===ADM_FOTO_USER&&s===ADM_FOTO_SENHA){const cb=_admFotoCb;_admFotoCb=null;document.getElementById('admFoto').style.display='none';if(cb)cb();}else{document.getElementById('admErro').textContent='Usuário ou senha incorretos.';}}
 function trocarFoto(id){pedirAdmFoto(()=>{const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();});}
+function removerFundo(ctx,size){try{
+  const im=ctx.getImageData(0,0,size,size),d=im.data;
+  if(d[3]<200||d[(size*size-1)*4+3]<200)return; // fonte ja transparente: nao mexe
+  const cor=p=>[d[p*4],d[p*4+1],d[p*4+2]];
+  const c0=cor(0),c1=cor(size-1),c2=cor(size*(size-1)),c3=cor(size*size-1);
+  const bg=[0,1,2].map(k=>(c0[k]+c1[k]+c2[k]+c3[k])/4);
+  const tol=66,N=size*size,vis=new Uint8Array(N),st=[];
+  const bgLike=p=>{const i=p*4;return Math.abs(d[i]-bg[0])+Math.abs(d[i+1]-bg[1])+Math.abs(d[i+2]-bg[2])<=tol;};
+  for(let x=0;x<size;x++){st.push(x);st.push((size-1)*size+x);}
+  for(let y=0;y<size;y++){st.push(y*size);st.push(y*size+size-1);}
+  while(st.length){const p=st.pop();if(vis[p])continue;vis[p]=1;if(!bgLike(p))continue;d[p*4+3]=0;const x=p%size,y=(p/size)|0;if(x>0)st.push(p-1);if(x<size-1)st.push(p+1);if(y>0)st.push(p-size);if(y<size-1)st.push(p+size);}
+  ctx.putImageData(im,0,0);
+}catch(e){}}
 function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{
   const W=img.width,H=img.height,size=400;
   // 1) acha a area do "assunto" (recorta a borda escura/lisa de fundo) numa analise em baixa resolucao
@@ -298,13 +311,15 @@ function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new 
       bx1=Math.min(W,(mxx+pw)/sc);by1=Math.min(H,(mxy+ph)/sc);
     }
   }catch(err){}
-  // 2) recorte quadrado que PREENCHE o assunto (cover), ancorado um pouco acima (mantem o rosto)
-  const cw=bx1-bx0,ch=by1-by0,lado=Math.min(cw,ch);
-  let sx=bx0+(cw-lado)/2,sy=by0+(ch-lado)*0.15;
+  // 2) recorte quadrado que CONTEM o assunto inteiro + margem (deixa fundo em volta p/ remover)
+  const cw=bx1-bx0,ch=by1-by0,cx=(bx0+bx1)/2,cy=(by0+by1)/2;
+  const lado=Math.min(W,H,Math.max(cw,ch)*1.12);
+  let sx=cx-lado/2,sy=cy-lado/2;
   sx=Math.max(0,Math.min(sx,W-lado));sy=Math.max(0,Math.min(sy,H-lado));
   const c=document.createElement('canvas');c.width=size;c.height=size;
-  c.getContext('2d').drawImage(img,sx,sy,lado,lado,0,0,size,size);
-  cb(c.toDataURL('image/jpeg',0.85));
+  const ctx=c.getContext('2d');ctx.drawImage(img,sx,sy,lado,lado,0,0,size,size);
+  removerFundo(ctx,size); // 3) deixa o fundo (ligado as bordas) transparente
+  cb(c.toDataURL('image/png'));
 };img.src=e.target.result;};r.readAsDataURL(file);}
 function delMatricula(id){const m=matriculas.find(x=>x.id===id);const v=m?getVend(m.vendedorId):null;if(!confirm('Excluir esta matrícula'+(v?' de '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;matriculas=matriculas.filter(x=>x.id!==id);salvarMatriculas();renderAdmin();}
 function addMat(vendedorId,delta){
