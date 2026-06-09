@@ -260,7 +260,7 @@ function addVendedor(){
 }
 function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vendedores.filter(v=>v.id!==id);salvarVendedores();renderAdmin();}}
 function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();}
-function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const mx=400;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.8));};img.src=e.target.result;};r.readAsDataURL(file);}
+function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const size=400;const lado=Math.min(img.width,img.height);const sx=(img.width-lado)/2,sy=(img.height-lado)/2;const c=document.createElement('canvas');c.width=size;c.height=size;c.getContext('2d').drawImage(img,sx,sy,lado,lado,0,0,size,size);cb(c.toDataURL('image/jpeg',0.85));};img.src=e.target.result;};r.readAsDataURL(file);}
 function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarMatriculas();renderAdmin();}
 function addMat(vendedorId,delta){
   if(delta>0){ lancarUmaMat(vendedorId); }
