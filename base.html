@@ -130,6 +130,19 @@
     <div id="listaMat" style="max-height:240px;overflow:auto"></div>
   </div>
 </div>
+<div id="admFoto" style="position:fixed;inset:0;background:rgba(3,6,20,.72);display:none;align-items:center;justify-content:center;z-index:600;padding:6vw">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:360px;width:100%">
+    <h2 style="color:var(--gold);margin-bottom:6px">🔒 Confirmar alteração de foto</h2>
+    <p class="hint" style="margin-bottom:16px">Informe o usuário e a senha de administrador para trocar a foto.</p>
+    <div class="fld" style="margin-bottom:10px"><input id="admUser" placeholder="Usuário" style="width:100%" autocomplete="off"/></div>
+    <div class="fld" style="margin-bottom:14px"><input id="admPass" type="password" placeholder="Senha" style="width:100%" autocomplete="off" onkeydown="if(event.key==='Enter')confirmarAdmFoto()"/></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" style="flex:1" onclick="confirmarAdmFoto()">Confirmar</button>
+      <button class="btn sec" onclick="fecharAdmFoto()">Cancelar</button>
+    </div>
+    <div id="admErro" style="color:#ef4444;font-size:13px;margin-top:10px;min-height:16px"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -259,7 +272,12 @@ function addVendedor(){
   if(file)comprimir(file,fin);else fin('');
 }
 function delVendedor(id){const v=getVend(id);if(!confirm('Remover o vendedor'+(v?' "'+v.nome+'"':'')+'?\n\nEssa ação não pode ser desfeita.'))return;vendedores=vendedores.filter(x=>x.id!==id);salvarVendedores();renderAdmin();}
-function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();}
+const ADM_FOTO_USER='Hendy',ADM_FOTO_SENHA='123';
+let _admFotoCb=null;
+function pedirAdmFoto(cb){_admFotoCb=cb;const m=document.getElementById('admFoto');document.getElementById('admUser').value='';document.getElementById('admPass').value='';document.getElementById('admErro').textContent='';m.style.display='flex';setTimeout(()=>document.getElementById('admUser').focus(),50);}
+function fecharAdmFoto(){_admFotoCb=null;document.getElementById('admFoto').style.display='none';}
+function confirmarAdmFoto(){const u=(document.getElementById('admUser').value||'').trim();const s=document.getElementById('admPass').value||'';if(u===ADM_FOTO_USER&&s===ADM_FOTO_SENHA){const cb=_admFotoCb;_admFotoCb=null;document.getElementById('admFoto').style.display='none';if(cb)cb();}else{document.getElementById('admErro').textContent='Usuário ou senha incorretos.';}}
+function trocarFoto(id){pedirAdmFoto(()=>{const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();});}
 function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{
   const W=img.width,H=img.height,size=400;
   // 1) acha a area do "assunto" (recorta a borda escura/lisa de fundo) numa analise em baixa resolucao
