@@ -260,7 +260,34 @@ function addVendedor(){
 }
 function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vendedores.filter(v=>v.id!==id);salvarVendedores();renderAdmin();}}
 function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();}
-function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const size=400;const lado=Math.min(img.width,img.height);const sx=(img.width-lado)/2,sy=(img.height-lado)/2;const c=document.createElement('canvas');c.width=size;c.height=size;c.getContext('2d').drawImage(img,sx,sy,lado,lado,0,0,size,size);cb(c.toDataURL('image/jpeg',0.85));};img.src=e.target.result;};r.readAsDataURL(file);}
+function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{
+  const W=img.width,H=img.height,size=400;
+  // 1) acha a area do "assunto" (recorta a borda escura/lisa de fundo) numa analise em baixa resolucao
+  let bx0=0,by0=0,bx1=W,by1=H;
+  try{
+    const aw=Math.min(W,600),sc=aw/W,ah=Math.round(H*sc);
+    const ac=document.createElement('canvas');ac.width=aw;ac.height=ah;
+    const axc=ac.getContext('2d');axc.drawImage(img,0,0,aw,ah);
+    const d=axc.getImageData(0,0,aw,ah).data;
+    const px=(x,y)=>{const i=(y*aw+x)*4;return [d[i],d[i+1],d[i+2]];};
+    const cs=[px(0,0),px(aw-1,0),px(0,ah-1),px(aw-1,ah-1)];
+    const bg=[0,1,2].map(k=>(cs[0][k]+cs[1][k]+cs[2][k]+cs[3][k])/4);
+    const thr=52;let mnx=aw,mny=ah,mxx=-1,mxy=-1;
+    for(let y=0;y<ah;y++){const row=y*aw*4;for(let x=0;x<aw;x++){const i=row+x*4;if(Math.abs(d[i]-bg[0])+Math.abs(d[i+1]-bg[1])+Math.abs(d[i+2]-bg[2])>thr){if(x<mnx)mnx=x;if(x>mxx)mxx=x;if(y<mny)mny=y;if(y>mxy)mxy=y;}}}
+    if(mxx>mnx&&mxy>mny&&(mxx-mnx)>aw*0.15&&(mxy-mny)>ah*0.15){
+      const pw=(mxx-mnx)*0.03,ph=(mxy-mny)*0.03;
+      bx0=Math.max(0,(mnx-pw)/sc);by0=Math.max(0,(mny-ph)/sc);
+      bx1=Math.min(W,(mxx+pw)/sc);by1=Math.min(H,(mxy+ph)/sc);
+    }
+  }catch(err){}
+  // 2) recorte quadrado que PREENCHE o assunto (cover), ancorado um pouco acima (mantem o rosto)
+  const cw=bx1-bx0,ch=by1-by0,lado=Math.min(cw,ch);
+  let sx=bx0+(cw-lado)/2,sy=by0+(ch-lado)*0.15;
+  sx=Math.max(0,Math.min(sx,W-lado));sy=Math.max(0,Math.min(sy,H-lado));
+  const c=document.createElement('canvas');c.width=size;c.height=size;
+  c.getContext('2d').drawImage(img,sx,sy,lado,lado,0,0,size,size);
+  cb(c.toDataURL('image/jpeg',0.85));
+};img.src=e.target.result;};r.readAsDataURL(file);}
 function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarMatriculas();renderAdmin();}
 function addMat(vendedorId,delta){
   if(delta>0){ lancarUmaMat(vendedorId); }
