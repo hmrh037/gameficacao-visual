@@ -258,7 +258,7 @@ function addVendedor(){
   const fin=foto=>{vendedores.push({id:uid(),nome,equipeId,foto:foto||''});salvarVendedores();document.getElementById('vNome').value='';document.getElementById('vFoto').value='';renderAdmin();toast('Vendedor adicionado');};
   if(file)comprimir(file,fin);else fin('');
 }
-function delVendedor(id){if(confirm('Remover este vendedor?')){vendedores=vendedores.filter(v=>v.id!==id);salvarVendedores();renderAdmin();}}
+function delVendedor(id){const v=getVend(id);if(!confirm('Remover o vendedor'+(v?' "'+v.nome+'"':'')+'?\n\nEssa ação não pode ser desfeita.'))return;vendedores=vendedores.filter(x=>x.id!==id);salvarVendedores();renderAdmin();}
 function trocarFoto(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(f)comprimir(f,b64=>{const v=getVend(id);if(v){v.foto=b64;salvarVendedores();renderAdmin();toast('Foto atualizada');}});};inp.click();}
 function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{
   const W=img.width,H=img.height,size=400;
@@ -288,7 +288,7 @@ function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new 
   c.getContext('2d').drawImage(img,sx,sy,lado,lado,0,0,size,size);
   cb(c.toDataURL('image/jpeg',0.85));
 };img.src=e.target.result;};r.readAsDataURL(file);}
-function delMatricula(id){matriculas=matriculas.filter(m=>m.id!==id);salvarMatriculas();renderAdmin();}
+function delMatricula(id){const m=matriculas.find(x=>x.id===id);const v=m?getVend(m.vendedorId):null;if(!confirm('Excluir esta matrícula'+(v?' de '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;matriculas=matriculas.filter(x=>x.id!==id);salvarMatriculas();renderAdmin();}
 function addMat(vendedorId,delta){
   if(delta>0){ lancarUmaMat(vendedorId); }
   else { // remove a matrícula mais recente de hoje
@@ -335,7 +335,7 @@ function addRecebimento(vendedorId){
   renderAdmin();
   const vd=getVend(vendedorId);toast('💰 '+forma+' de '+fmtBRL(valor)+' — '+(vd?vd.nome:''));
 }
-function delRecebimento(id){recebimentos=recebimentos.filter(r=>r.id!==id);salvarRecebimentos();renderAdmin();}
+function delRecebimento(id){const r=recebimentos.find(x=>x.id===id);const v=r?getVend(r.vendedorId):null;if(!confirm('Excluir este recebimento'+(r?' de '+fmtBRL(r.valor):'')+(v?' — '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;recebimentos=recebimentos.filter(x=>x.id!==id);salvarRecebimentos();renderAdmin();}
 iniciar();renderAdmin();
 </script>
 </body>
