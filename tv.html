@@ -48,7 +48,8 @@
   .pod-pos{font-size:1.6vh;font-weight:900;color:var(--pc,#888);letter-spacing:1px;}
   .pod-pts{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:3.4vh;font-weight:900;line-height:1;}
   .pod-pts span{display:block;font-family:'Satoshi','Inter',sans-serif;font-size:1.25vh;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:.2vh;}
-  .pod-prize{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:2.15vh;font-weight:800;color:#1bff9c;margin-top:.5vh;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45);}
+  .pod-prize{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:2.15vh;font-weight:800;color:var(--green);margin-top:.5vh;}
+  .pod-prize.neon{color:#1bff9c;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45);}
   .pod-1 .pod-av{width:17vh;height:17vh;}
   .pod-1 .pod-nm{font-size:2.9vh;}
   .pod-1 .pod-med{font-size:4vh;}
@@ -106,7 +107,8 @@
   .t-nm small{display:block;font-size:1.4vh;font-weight:700;}
   .t-qtd{font-size:2.9vh;font-weight:900;text-align:center;}
   .t-rec{font-size:1.85vh;color:var(--muted);text-align:center;}
-  .t-rec.recebeu{color:#1bff9c;font-weight:800;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45);}
+  .t-rec.recebeu{color:var(--green);font-weight:800;}
+  .t-rec.neon{color:#1bff9c;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45);}
   .t-bar{height:1.5vh;background:#0006;border-radius:999px;overflow:hidden;}
   .t-bar i{display:block;height:100%;border-radius:999px;transition:width .8s;}
 
@@ -364,7 +366,7 @@ function renderRanking(){
       <span class="t-medal">${medalHTML(a.qtd,'medal-r')}</span>
       <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd>0?a.qtd:'-'}</span>
-      <span class="t-rec${a.rec>0?' recebeu':''}">${a.rec>0?fmtBRL(a.rec):'-'}</span>
+      <span class="t-rec${a.rec>0?' recebeu':''}${a.rec>1000?' neon':''}">${a.rec>0?fmtBRL(a.rec):'-'}</span>
       <span class="t-bar"><i style="width:${Math.min(a.qtd,5)/5*100}%;background:${corBarra(a.qtd)}"></i></span>
     </div>`;}).join('');
 }
@@ -459,7 +461,7 @@ function renderPodio(){
       <div class="pod-eq" style="color:${eq.cor}">${eq.nome}</div>
       <div class="pedestal${a.rec>0?'':' sem-rec'}">
         <div class="pod-pts">${a.qtd}<span>matrículas</span></div>
-        ${a.rec>0?`<div class="pod-prize">${fmtBRL(a.rec)}</div>`:''}
+        ${a.rec>0?`<div class="pod-prize${a.rec>1000?' neon':''}">${fmtBRL(a.rec)}</div>`:''}
       </div>
     </div>`;
   }).join('');
