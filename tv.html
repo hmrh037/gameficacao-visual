@@ -60,6 +60,8 @@
   .pod-1 .pedestal{min-height:16vh;background:linear-gradient(180deg,rgba(212,175,55,.18),var(--card));}
   .pod-2 .pedestal{min-height:11vh;background:linear-gradient(180deg,rgba(203,213,225,.16),var(--card));}
   .pod-3 .pedestal{min-height:9vh;background:linear-gradient(180deg,rgba(205,127,50,.16),var(--card));}
+  /* fundo tematico do time no pedestal (vem depois dos pod-N p/ sobrepor) */
+  .pedestal.time-atlas{background:linear-gradient(180deg,rgba(8,6,14,.4),rgba(8,6,14,.68)),url('imagens/atlas-bg.png') center/cover no-repeat;border-top-color:rgba(190,150,70,.7);}
   .pod-vazio{opacity:.3;}
   .pod-vazio .pedestal{min-height:9vh;}
 
@@ -458,6 +460,7 @@ function renderPodio(){
   cont.innerHTML=ordem.map(({a,pos})=>{
     if(!a)return '<div class="pod pod-'+pos+' pod-vazio"><div class="pedestal"></div></div>';
     const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
+    const slug=(eq.nome||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
     const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
     return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
       <div class="pod-rank">${pos}º</div>
@@ -465,7 +468,7 @@ function renderPodio(){
       <div class="pod-av">${foto}</div>
       <div class="pod-nm">${a.v.nome}</div>
       <div class="pod-eq" style="color:${eq.cor}">${eq.nome}</div>
-      <div class="pedestal${a.rec>0?'':' sem-rec'}">
+      <div class="pedestal${a.rec>0?'':' sem-rec'}${slug?' time-'+slug:''}">
         <div class="pod-pts">${a.qtd}<span>matrículas</span></div>
         ${a.rec>0?`<div class="pod-prize${a.rec>1000?' neon':''}">${fmtBRL(a.rec)}</div>`:''}
       </div>
