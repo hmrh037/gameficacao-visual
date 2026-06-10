@@ -62,6 +62,8 @@
   .corpo{flex:1;display:grid;grid-template-columns:1.25fr .75fr;gap:1.2vw;padding:.5vh 1.8vw .8vh;min-height:0;}
   .card{background:linear-gradient(180deg,#1b1630,#110e1c);border:1px solid var(--border);border-radius:1.4vh;padding:1.4vh 1.3vw;display:flex;flex-direction:column;min-height:0;box-shadow:0 8px 30px rgba(0,0,0,.32);}
   .cardhead,.slidehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1vh;}
+  .slidehead{flex-direction:column;justify-content:center;gap:.5vh;}
+  .slidehead h2{text-align:center;}
   .cardhead h2,.slidehead h2{font-size:2.2vh;font-weight:800;letter-spacing:.3px;color:var(--text);}
   .tag{font-size:1.1vh;font-weight:800;color:var(--green);background:rgba(0,208,132,.12);border-radius:.5vh;padding:.35vh .8vw;letter-spacing:1.5px;display:flex;align-items:center;gap:.4vw;}
   .tag .pulse{width:.9vh;height:.9vh;}
@@ -403,7 +405,7 @@ const SLIDES=[
   {t:'🏆 Ranking de Recebimentos',f:slideRankReceb},
   {t:'🛡️ Equipes — quem está na frente',f:slideEquipes},
   {t:'📅 Acumulado — dias anteriores + hoje',f:slideDiasAnteriores},
-  {t:'🏅 Ligas — vendedores por liga',f:slideLigas}
+  {t:'🏅 Ligas',f:slideLigas}
 ];
 let slideIdx=0;
 function renderSlide(){
