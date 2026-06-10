@@ -393,7 +393,9 @@ function slideRankReceb(){
   return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${a.rec/max*100}%;background:#00d084"></i></div><div class="qtd" style="font-size:2vh;width:auto">${fmtBRL(a.rec)}</div></div>`;}).join('')+'</div>';
 }
 function slideEquipes(){
-  const {porEq}=stats();const arr=equipes.map(e=>porEq[e.id]||{e,qtd:0,valor:0,rec:0});if(!arr.length)return '<div class="vazio">Cadastre as equipes.</div>';
+  if(!equipes.length)return '<div class="vazio">Cadastre as equipes.</div>';
+  // total GERAL (qtdGeral + recGeral) de todos os vendedores de cada equipe
+  const arr=equipes.map(e=>{let qtd=0,rec=0;vendedores.forEach(v=>{if(v.equipeId===e.id){qtd+=Number(v.qtdGeral)||0;rec+=Number(v.recGeral)||0;}});return {e,qtd,rec};});
   const maxQ=Math.max(1,...arr.map(a=>a.qtd));const ord=[...arr].sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
   return '<div class="ranking">'+ord.map((a,i)=>`<div class="linha" style="flex-direction:column;align-items:stretch;gap:.7vh">
     <div style="display:flex;align-items:center;gap:1vw">
