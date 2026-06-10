@@ -472,25 +472,26 @@ function renderPainel(){renderPodio();renderRanking();renderSlide();}
 let ultraTimer=null;
 function currentOrder(){const {porVend}=stats();return Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec).map(a=>({id:a.v.id,qtd:a.qtd,rec:a.rec}));}
 // x esta ESTRITAMENTE a frente de y: mais matriculas, ou empate em matriculas com mais recebimento.
-// Empate puro (mesmas matriculas e mesmo recebimento) NAO conta como ultrapassagem.
 function ultraMelhor(a,b){return a.qtd>b.qtd||(a.qtd===b.qtd&&a.rec>b.rec);}
+// A ultrapassagem so aparece quando DESEMPATA: x e y estavam empatados em matriculas (e x nao estava a frente)
+// e agora x ficou estritamente a frente. So entre os dois que estavam empatados (nada de pular do nada).
 function checarUltra(){
   const ord=currentOrder();
   // so anima com o painel aberto; durante o carregamento dos dados apenas atualiza a base (sem disparar)
   if(painelAtivo&&prevOrder){
-    const pm={};prevOrder.forEach((o,idx)=>{pm[o.id]={qtd:o.qtd,rec:o.rec,idx};});
-    for(let i=0;i<ord.length;i++){
-      const x=ord[i],px=pm[x.id];
-      if(px&&px.idx>i){ // x subiu de posição
-        let passado=null;
-        for(let j=i+1;j<ord.length;j++){
-          const y=ord[j],py=pm[y.id];
-          // y estava acima de x antes E agora x esta estritamente a frente (nao so empatado)
-          if(py&&py.idx<px.idx&&ultraMelhor(x,y)){passado=y.id;break;}
-        }
-        if(passado!=null){const X=x.id,Y=passado;setTimeout(()=>mostrarUltrapassagem(X,Y),1200);break;}
+    const prev={};prevOrder.forEach(o=>{prev[o.id]=o;});
+    let par=null;
+    for(const x of ord){
+      const px=prev[x.id];if(!px)continue;
+      for(const y of ord){
+        if(y.id===x.id)continue;
+        const py=prev[y.id];if(!py)continue;
+        // antes: empatados em matriculas e x NAO estava a frente | agora: x desempatou e esta a frente
+        if(px.qtd===py.qtd&&!ultraMelhor(px,py)&&ultraMelhor(x,y)){par={X:x.id,Y:y.id};break;}
       }
+      if(par)break;
     }
+    if(par){const {X,Y}=par;setTimeout(()=>mostrarUltrapassagem(X,Y),1200);}
   }
   prevOrder=ord;
 }
