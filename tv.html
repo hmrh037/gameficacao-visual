@@ -29,7 +29,10 @@
   .brand h1{font-size:2.9vh;font-weight:900;letter-spacing:1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
   .brand .sub{display:inline-flex;align-items:center;gap:.7vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
-  .navright{display:flex;align-items:center;}
+  .navright{display:flex;align-items:center;gap:1.1vw;}
+  .tot-dia{display:flex;align-items:center;gap:.5vw;}
+  .tot-dia .td-num{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:3.4vh;font-weight:900;color:var(--gold);line-height:1;}
+  .tot-dia .td-lbl{font-size:1.15vh;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);line-height:1.15;}
 
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.1vh 6vw 0;}
@@ -244,7 +247,7 @@
     <div class="brand"><span class="logo"><img src="tiers/unreal.png" alt="Unreal" onerror="this.replaceWith(document.createTextNode('🏆'))"/></span>
       <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking de Vendas</div></div>
     </div>
-    <div class="navright"><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
+    <div class="navright"><div class="tot-dia"><span class="td-num" id="totDiaNum">0</span><span class="td-lbl">matrículas<br>hoje</span></div><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
   </header>
   <section class="podio" id="podio"></section>
   <section class="corpo">
@@ -466,7 +469,8 @@ function renderPodio(){
     </div>`;
   }).join('');
 }
-function renderPainel(){renderPodio();renderRanking();renderSlide();}
+function renderTotalDia(){const el=document.getElementById('totDiaNum');if(!el)return;const hoje=hojeStr();el.textContent=matriculas.filter(m=>m.data===hoje).length;}
+function renderPainel(){renderPodio();renderRanking();renderSlide();renderTotalDia();}
 
 // ---- ultrapassagem no ranking ----
 let ultraTimer=null;
