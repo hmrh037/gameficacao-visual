@@ -393,11 +393,10 @@ function slideEquipes(){
     </div>
     <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
 }
-// Acumulado: vendas de dias anteriores (manual) + hoje (matriculas). So exibicao — NAO entra no ranking/meta do dia
+// Geral: quantidade geral de matriculas, lancada MANUALMENTE no painel (campo qtdGeral). So exibicao — NAO entra na meta do dia.
 function slideDiasAnteriores(){
-  const hoje=hojeStr();
-  let arr=vendedores.map(v=>{const ant=Number(v.vendasAnteriores)||0;const hj=matriculas.filter(m=>m.vendedorId===v.id&&m.data===hoje).length;return {v,ant,hj,total:ant+hj};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total);
-  if(!arr.length)return '<div class="vazio">Sem vendas de dias anteriores cadastradas no painel.</div>';
+  let arr=vendedores.map(v=>{const total=Number(v.qtdGeral)||0;return {v,total};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total);
+  if(!arr.length)return '<div class="vazio">Nenhuma quantidade geral lançada no painel.</div>';
   const max=Math.max(1,...arr.map(a=>a.total));
   // mesma logica da barra de progresso: cor pelo preenchimento (ate 40% amarelo, ate 80% azul, acima verde)
   const corFill=pct=>pct<=.4?'#f1c40f':pct<=.8?'#3b82f6':'#00d084';
