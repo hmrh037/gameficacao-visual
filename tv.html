@@ -28,7 +28,10 @@
   .brand .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,.45));}
   .brand h1{font-size:2.9vh;font-weight:900;letter-spacing:1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
-  .brand .sub{display:inline-flex;align-items:center;gap:.9vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
+  .brand .sub{display:inline-flex;align-items:center;gap:.7vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
+  .sub .ranks{display:inline-flex;align-items:center;gap:.32vw;}
+  .sub .ranks img{height:2vh;width:auto;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));}
+  .navright{display:flex;align-items:center;}
 
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.1vh 6vw 0;}
@@ -216,8 +219,9 @@
 <div id="painel" class="hidden">
   <header class="nav">
     <div class="brand"><span class="logo"><img src="tiers/unreal.png" alt="Unreal" onerror="this.replaceWith(document.createTextNode('🏆'))"/></span>
-      <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking <span class="tag"><span class="pulse"></span>AO VIVO</span></div></div>
+      <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking <span class="ranks"><img src="tiers/bronze.png" alt="" onerror="this.remove()"/><img src="tiers/silver.png" alt="" onerror="this.remove()"/><img src="tiers/gold.png" alt="" onerror="this.remove()"/><img src="tiers/platinum.png" alt="" onerror="this.remove()"/><img src="tiers/diamond.png" alt="" onerror="this.remove()"/><img src="tiers/elite.png" alt="" onerror="this.remove()"/><img src="tiers/champion.png" alt="" onerror="this.remove()"/><img src="tiers/unreal.png" alt="" onerror="this.remove()"/></span></div></div>
     </div>
+    <div class="navright"><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
   </header>
   <section class="podio" id="podio"></section>
   <section class="corpo">
