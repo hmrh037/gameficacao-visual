@@ -67,10 +67,10 @@
   .tag .pulse{width:.9vh;height:.9vh;}
 
   /* TABELA RANKING */
-  .thead{display:grid;grid-template-columns:4vh 5vh minmax(0,1.8fr) 7vh 13vh minmax(0,1fr);gap:1vw;align-items:center;padding:.7vh 1vw;font-size:1.3vh;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);background:rgba(150,140,230,.08);border-radius:.8vh;border:1px solid transparent;}
-  .thead .r{text-align:right;}
+  .thead{display:grid;grid-template-columns:4vh 5vh minmax(0,1.8fr) 7vh 13vh minmax(0,1fr);gap:1vw;align-items:center;padding:.7vh 1vw;font-size:1.3vh;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);background:rgba(150,140,230,.08);border-radius:.8vh;border:1px solid transparent;text-align:center;}
+  .thead .r{text-align:center;}
   .thead .c{text-align:center;}
-  .thead .vh{padding-left:calc(5.4vh + .8vw);}
+  .thead .vh{text-align:center;}
   .t-medal{display:flex;align-items:center;justify-content:center;}
   .ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.4vh;margin-top:.6vh;}
   .trow{display:grid;grid-template-columns:4vh 5vh minmax(0,1.8fr) 7vh 13vh minmax(0,1fr);gap:1vw;align-items:center;padding:.55vh 1vw;border-radius:1vh;border:1px solid transparent;transition:background .2s,transform .2s;}
@@ -101,8 +101,8 @@
   .lad-nm{font-size:1.6vh;font-weight:800;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
   .lad-ct{font-size:2.5vh;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--text);}
   .t-nm small{display:block;font-size:1.4vh;font-weight:700;}
-  .t-qtd{font-size:2.9vh;font-weight:900;text-align:right;}
-  .t-rec{font-size:1.85vh;color:var(--muted);text-align:right;}
+  .t-qtd{font-size:2.9vh;font-weight:900;text-align:center;}
+  .t-rec{font-size:1.85vh;color:var(--muted);text-align:center;}
   .t-rec.recebeu{color:#1bff9c;font-weight:800;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45);}
   .t-bar{height:1.5vh;background:#0006;border-radius:999px;overflow:hidden;}
   .t-bar i{display:block;height:100%;border-radius:999px;transition:width .8s;}
