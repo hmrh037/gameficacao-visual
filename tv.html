@@ -362,15 +362,19 @@ function iniciais(n){return (n||'').trim().split(/\s+/).map(p=>p[0]||'').slice(0
 // cor da barra pela qtd de matriculas: amarelo (1-2) -> azul (3-4) -> verde (5+)
 function corBarra(q){return q<=2?'#f1c40f':q<=4?'#3b82f6':'#00d084';}
 function renderRanking(){
-  const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);const max=Math.max(1,...arr.map(a=>a.qtd));
+  const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
   const el=document.getElementById('ranking');
-  const resto=arr; // todos os vendedores, do 1o lugar em diante
-  if(!resto.length){el.innerHTML='<div class="vazio">Nenhuma colocação no período ainda.</div>';return;}
-  el.innerHTML=resto.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
+  // o top 3 (com resultado) fica SO no podium -> nao aparece na tabela; a tabela comeca no 4o lugar
+  const comRes=arr.filter(a=>a.qtd>0);
+  const noPodium=new Set(comRes.slice(0,3).map(a=>a.v.id));
+  const rankOf={};comRes.forEach((a,idx)=>{rankOf[a.v.id]=idx+1;});
+  const resto=arr.filter(a=>!noPodium.has(a.v.id));
+  if(!resto.length){el.innerHTML='<div class="vazio">Sem colocações além do pódio.</div>';return;}
+  el.innerHTML=resto.map((a)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const slug=(eq.nome||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
-    return `<div class="trow${a.qtd>0&&i<3?' pod'+(i+1):''}${slug?' time-'+slug:''}" data-vid="${a.v.id}">
-      <span class="t-rank">${a.qtd>0?(i+1):'-'}</span>
+    return `<div class="trow${slug?' time-'+slug:''}" data-vid="${a.v.id}">
+      <span class="t-rank">${a.qtd>0?rankOf[a.v.id]:'-'}</span>
       <span class="t-medal">${medalHTML(a.qtd,'medal-r')}</span>
       <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd>0?a.qtd:'-'}</span>
