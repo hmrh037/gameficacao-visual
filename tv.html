@@ -66,10 +66,12 @@
   .tag .pulse{width:.9vh;height:.9vh;}
 
   /* TABELA RANKING */
-  .thead{display:grid;grid-template-columns:4vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.7vh 1vw;font-size:1.3vh;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);background:rgba(255,255,255,.04);border-radius:.8vh;}
+  .thead{display:grid;grid-template-columns:4vh 5vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.7vh 1vw;font-size:1.3vh;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);background:rgba(255,255,255,.04);border-radius:.8vh;}
   .thead .r{text-align:right;}
+  .thead .c{text-align:center;}
+  .t-medal{display:flex;align-items:center;justify-content:center;}
   .ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.4vh;margin-top:.6vh;}
-  .trow{display:grid;grid-template-columns:4vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.55vh 1vw;border-radius:1vh;border:1px solid transparent;transition:background .2s,transform .2s;}
+  .trow{display:grid;grid-template-columns:4vh 5vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.55vh 1vw;border-radius:1vh;border:1px solid transparent;transition:background .2s,transform .2s;}
   .trow:nth-child(even){background:rgba(255,255,255,.018);}
   .ranking .trow.pod1{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);border-color:rgba(212,175,55,.32);}
   .t-rank{font-size:2.4vh;font-weight:900;color:var(--muted);text-align:center;}
@@ -220,7 +222,7 @@
   <section class="corpo">
     <div class="card">
       <div class="cardhead"><h2>📋 Colocações</h2></div>
-      <div class="thead"><span>#</span><span>Vendedor</span><span class="r">Matr.</span><span class="r">Recebido</span><span>Progresso</span></div>
+      <div class="thead"><span class="c">#</span><span class="c">Rank</span><span>Vendedor</span><span class="r">Matr.</span><span class="r">Recebido</span><span>Progresso</span></div>
       <div class="ranking" id="ranking"></div>
     </div>
     <div class="card">
@@ -334,7 +336,8 @@ function renderRanking(){
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow${a.qtd>0&&i<3?' pod'+(i+1):''}" data-vid="${a.v.id}">
       <span class="t-rank">${a.qtd>0?(i+1):'-'}</span>
-      <span class="t-vend">${medalHTML(a.qtd,'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
+      <span class="t-medal">${medalHTML(a.qtd,'medal-r')}</span>
+      <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec${a.rec>0?' recebeu':''}">${fmtBRL(a.rec)}</span>
       <span class="t-bar"><i style="width:${Math.min(a.qtd,5)/5*100}%;background:${corBarra(a.qtd)}"></i></span>
