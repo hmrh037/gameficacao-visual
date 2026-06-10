@@ -388,7 +388,7 @@ function slideDiasAnteriores(){
   let arr=vendedores.map(v=>{const ant=Number(v.vendasAnteriores)||0;const hj=matriculas.filter(m=>m.vendedorId===v.id&&m.data===hoje).length;return {v,ant,hj,total:ant+hj};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total).slice(0,6);
   if(!arr.length)return '<div class="vazio">Sem vendas de dias anteriores cadastradas no painel.</div>';
   const max=Math.max(1,...arr.map(a=>a.total));
-  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome} · ${a.ant} ant + ${a.hj} hoje</div></div><div class="barra"><i style="width:${a.total/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.total}</div></div>`;}).join('')+'</div>';
+  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${i+1}º</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div></div><div class="barra"><i style="width:${a.total/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.total}</div></div>`;}).join('')+'</div>';
 }
 function slideLigas(){
   const {porVend}=stats();
