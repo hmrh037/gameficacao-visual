@@ -340,8 +340,8 @@ function renderRanking(){
       <span class="t-rank">${a.qtd>0?(i+1):'-'}</span>
       <span class="t-medal">${medalHTML(a.qtd,'medal-r')}</span>
       <span class="t-vend">${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
-      <span class="t-qtd">${a.qtd}</span>
-      <span class="t-rec${a.rec>0?' recebeu':''}">${fmtBRL(a.rec)}</span>
+      <span class="t-qtd">${a.qtd>0?a.qtd:'-'}</span>
+      <span class="t-rec${a.rec>0?' recebeu':''}">${a.rec>0?fmtBRL(a.rec):'-'}</span>
       <span class="t-bar"><i style="width:${Math.min(a.qtd,5)/5*100}%;background:${corBarra(a.qtd)}"></i></span>
     </div>`;}).join('');
 }
