@@ -347,7 +347,7 @@ function colBar(foto,nome,altPct,cor,label){return `<div class="gcol"><div class
 function slideGraficoVendas(){
   const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd).slice(0,6);const max=Math.max(1,...arr.map(a=>a.qtd));
   if(!arr.length)return '<div class="vazio">Sem matrículas no período.</div>';
-  return '<div class="grafico">'+arr.map(a=>colBar(a.v.foto,a.v.nome,a.qtd/max*100,corBarra(a.qtd),a.qtd)).join('')+'</div>';
+  return '<div class="grafico">'+arr.map(a=>colBar(a.v.foto,a.v.nome,Math.min(a.qtd,5)/5*100,corBarra(a.qtd),a.qtd)).join('')+'</div>';
 }
 function slideGraficoReceb(){
   const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.rec>0).sort((a,b)=>b.rec-a.rec).slice(0,6);const max=Math.max(1,...arr.map(a=>a.rec));
@@ -357,7 +357,7 @@ function slideGraficoReceb(){
 function slideRankVendas(){
   const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor).slice(0,6);const max=Math.max(1,...arr.map(a=>a.qtd));
   if(!arr.length)return '<div class="vazio">Sem vendas no período.</div>';
-  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${a.qtd/max*100}%;background:${corBarra(a.qtd)}"></i></div><div class="qtd">${a.qtd}</div></div>`;}).join('')+'</div>';
+  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${Math.min(a.qtd,5)/5*100}%;background:${corBarra(a.qtd)}"></i></div><div class="qtd">${a.qtd}</div></div>`;}).join('')+'</div>';
 }
 function slideRankReceb(){
   const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.rec>0).sort((a,b)=>b.rec-a.rec).slice(0,6);const max=Math.max(1,...arr.map(a=>a.rec));
