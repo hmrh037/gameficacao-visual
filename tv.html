@@ -293,7 +293,7 @@ function conectar(){
   db.ref('painel/estado/equipes').on('value',s=>{equipes=s.val()||[];renderPainel();});
   db.ref('painel/estado/vendedores').on('value',s=>{vendedores=s.val()||[];renderPainel();});
   db.ref('painel/estado/matriculas').on('value',s=>{matriculas=s.val()||[];renderPainel();checarUltra();});
-  db.ref('painel/estado/recebimentos').on('value',s=>{recebimentos=s.val()||[];renderPainel();});
+  db.ref('painel/estado/recebimentos').on('value',s=>{recebimentos=s.val()||[];renderPainel();checarUltra();});
   db.ref('painel/estado/config').on('value',s=>{
     const c=s.val();if(c)config={...config,...c};
     const np=config.periodo||'hoje';const pmudou=np!==periodo;periodo=np;
@@ -462,7 +462,8 @@ function currentOrder(){const {porVend}=stats();return Object.values(porVend).fi
 function ultraMelhor(a,b){return a.qtd>b.qtd||(a.qtd===b.qtd&&a.rec>b.rec);}
 function checarUltra(){
   const ord=currentOrder();
-  if(prevOrder){
+  // so anima com o painel aberto; durante o carregamento dos dados apenas atualiza a base (sem disparar)
+  if(painelAtivo&&prevOrder){
     const pm={};prevOrder.forEach((o,idx)=>{pm[o.id]={qtd:o.qtd,rec:o.rec,idx};});
     for(let i=0;i<ord.length;i++){
       const x=ord[i],px=pm[x.id];
@@ -582,7 +583,7 @@ function checarInatividade(){
 }
 setInterval(checarInatividade,20000);
 
-function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();}
+function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}rebaseOrder();renderPainel();}
 // ---- rodizio de slides: o slide "Geral" ganha tempo extra e roda a mesma
 //      animacao de rolagem da tabela principal (desce devagar -> pausa -> volta) antes de trocar.
 const SLIDE_MS=7000;
