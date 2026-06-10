@@ -251,13 +251,13 @@ const FORMA_ICON={'Cartão':'💳','À vista':'💵','Boleto':'🧾','PIX':'⚡'
 // Ligas (tiers) pelo TOTAL GERAL de matriculas — do mais fraco ao mais forte
 const TIERS=[
   {nome:'Bronze',min:1,cor:'#cd7f32',img:'tiers/bronze.png'},
-  {nome:'Silver',min:2,cor:'#cbd5e1',img:'tiers/silver.png'},
-  {nome:'Gold',min:3,cor:'#d4af37',img:'tiers/gold.png'},
-  {nome:'Platinum',min:4,cor:'#5eead4',img:'tiers/platinum.png'},
-  {nome:'Diamond',min:5,cor:'#60a5fa',img:'tiers/diamond.png'},
+  {nome:'Prata',min:2,cor:'#cbd5e1',img:'tiers/silver.png'},
+  {nome:'Ouro',min:3,cor:'#d4af37',img:'tiers/gold.png'},
+  {nome:'Platina',min:4,cor:'#5eead4',img:'tiers/platinum.png'},
+  {nome:'Diamante',min:5,cor:'#60a5fa',img:'tiers/diamond.png'},
   {nome:'Elite',min:6,cor:'#a78bfa',img:'tiers/elite.png'},
-  {nome:'Champion',min:7,cor:'#fb923c',img:'tiers/champion.png'},
-  {nome:'Unreal',min:8,cor:'#c084fc',img:'tiers/unreal.png'}
+  {nome:'Lenda',min:7,cor:'#fb923c',img:'tiers/champion.png'},
+  {nome:'Surreal',min:8,cor:'#c084fc',img:'tiers/unreal.png'}
 ];
 function tierIdx(total){let idx=-1;for(let i=0;i<TIERS.length;i++){if(total>=TIERS[i].min)idx=i;}return idx;}
 function medalFallback(img,nome,cor){const s=document.createElement('span');s.className=img.className+' medal-fb';s.textContent=(nome||'?').charAt(0);s.style.background=cor;s.title=nome||'';img.replaceWith(s);}
