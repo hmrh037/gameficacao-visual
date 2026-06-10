@@ -416,7 +416,7 @@ function renderPodio(){
   const {porVend}=stats();
   const arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);
   const cont=document.getElementById('podio');if(!cont)return;
-  if(!arr.length){cont.innerHTML='<div class="vazio" style="width:100%">Aguardando matrículas no período...</div>';return;}
+  if(!arr.length){cont.innerHTML='<div class="vazio" style="width:100%">Aguardando resultados...</div>';return;}
   const med={1:'🥇',2:'🥈',3:'🥉'},cor={1:'#d4af37',2:'#cbd5e1',3:'#cd7f32'};
   const ordem=[{a:arr[1],pos:2},{a:arr[0],pos:1},{a:arr[2],pos:3}]; // 2º à esquerda, 1º no centro, 3º à direita
   cont.innerHTML=ordem.map(({a,pos})=>{
