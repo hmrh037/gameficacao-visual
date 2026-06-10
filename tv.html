@@ -512,10 +512,19 @@ function checarUltra(){
       if(par)break;
     }
     if(par){const {X,Y}=par;setTimeout(()=>mostrarUltrapassagem(X,Y),1200);}
+  } else {
+    // ainda assentando os dados (load/F5): cada evento reinicia a contagem; so liga apos parar de chegar dado
+    agendarUltraPronto();
   }
   prevOrder=ord;
 }
 function rebaseOrder(){prevOrder=currentOrder();}
+let ultraSettleTimer=null;
+function agendarUltraPronto(){
+  if(ultraPronto)return;
+  if(ultraSettleTimer)clearTimeout(ultraSettleTimer);
+  ultraSettleTimer=setTimeout(()=>{rebaseOrder();ultraPronto=true;},3000); // 3s SEM mudancas -> dados assentaram
+}
 function tocarUltrapassagem(){if(!som)return;try{if(!somUltra)somUltra=new Audio(SOM_ULTRA);somUltra.volume=volCom();somUltra.currentTime=0;somUltra.play().catch(()=>{});}catch(e){}}
 function confeteEm(cont,n){const cores=['#d4af37','#00d084','#3b82f6','#ff4757','#a855f7','#ec4899','#fff'];for(let i=0;i<(n||70);i++){const c=document.createElement('div');c.className='confete';c.style.left=(Math.random()*100)+'vw';c.style.background=cores[Math.floor(Math.random()*cores.length)];c.style.animationDuration=(2.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*1)+'s';if(Math.random()>.5)c.style.borderRadius='50%';cont.appendChild(c);setTimeout(()=>c.remove(),6000);}}
 function mostrarUltrapassagem(xId,yId){
@@ -619,8 +628,8 @@ function checarInatividade(){
 setInterval(checarInatividade,20000);
 
 function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();
-  // so habilita a ultrapassagem depois que os dados do Firebase assentam (evita falso positivo no F5/carregamento)
-  ultraPronto=false;setTimeout(()=>{rebaseOrder();ultraPronto=true;},5000);}
+  // so habilita a ultrapassagem depois que os dados do Firebase pararem de chegar (evita falso positivo no F5/carregamento)
+  ultraPronto=false;agendarUltraPronto();}
 // ---- rodizio de slides: o slide "Geral" ganha tempo extra e roda a mesma
 //      animacao de rolagem da tabela principal (desce devagar -> pausa -> volta) antes de trocar.
 const SLIDE_MS=7000;
