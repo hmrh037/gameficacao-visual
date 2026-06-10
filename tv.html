@@ -552,6 +552,32 @@ setInterval(checarInatividade,20000);
 
 function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();}
 setInterval(proximoSlide,7000);
+
+// ---- rolagem lenta da tabela de Colocacoes (a cada 30s revela os demais) ----
+let rankAnim=null;
+function animarScrollRank(el,destino,dur,cb){
+  if(rankAnim)clearInterval(rankAnim);
+  const ini=el.scrollTop,dist=destino-ini;
+  if(Math.abs(dist)<1){el.scrollTop=destino;if(cb)cb();return;}
+  const t0=Date.now();
+  rankAnim=setInterval(()=>{
+    const p=Math.min(1,(Date.now()-t0)/dur);
+    const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2; // easeInOut
+    el.scrollTop=ini+dist*e;
+    if(p>=1){clearInterval(rankAnim);rankAnim=null;if(cb)cb();}
+  },16);
+}
+function rolarColocacoes(){
+  if(!painelAtivo)return;
+  const el=document.getElementById('ranking');if(!el)return;
+  const max=el.scrollHeight-el.clientHeight;
+  if(max<=6){el.scrollTop=0;return;} // tudo cabe, nada a rolar
+  animarScrollRank(el,max,Math.max(5000,max*22),()=>{          // desce devagar
+    setTimeout(()=>animarScrollRank(el,0,3500),2500);          // pausa e volta
+  });
+}
+setInterval(rolarColocacoes,30000);
+
 conectar();renderPainel();
 </script>
 </body>
