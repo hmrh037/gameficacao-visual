@@ -321,6 +321,8 @@ function stats(){
 }
 // TABELA DE RANKING (estilo ações)
 function iniciais(n){return (n||'').trim().split(/\s+/).map(p=>p[0]||'').slice(0,2).join('').toUpperCase()||'🧑';}
+// cor da barra pela qtd de matriculas: amarelo (1-2) -> azul (3-4) -> verde (5+)
+function corBarra(q){return q<=2?'#f1c40f':q<=4?'#3b82f6':'#00d084';}
 function renderRanking(){
   const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);const max=Math.max(1,...arr.map(a=>a.qtd));
   const el=document.getElementById('ranking');
@@ -333,7 +335,7 @@ function renderRanking(){
       <span class="t-vend">${medalHTML(a.qtd,'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec">${fmtBRL(a.valor)}</span>
-      <span class="t-bar"><i style="width:${a.qtd/max*100}%;background:${eq.cor}"></i></span>
+      <span class="t-bar"><i style="width:${a.qtd/max*100}%;background:${corBarra(a.qtd)}"></i></span>
     </div>`;}).join('');
 }
 const medalha=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
