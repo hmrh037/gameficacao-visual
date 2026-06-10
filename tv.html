@@ -137,7 +137,17 @@
   .linha .info .eqtag{font-size:1.6vh;font-weight:700;}
   .linha .barra{flex:1.4;height:1.5vh;background:#0006;border-radius:999px;overflow:hidden;}
   .linha .barra i{display:block;height:100%;border-radius:999px;transition:width .8s;}
-  .linha .qtd{font-size:3.1vh;font-weight:900;width:5.4vh;text-align:right;}
+  .linha .qtd{font-size:3.1vh;font-weight:900;width:5.4vh;text-align:center;flex-shrink:0;}
+  .linha .rec{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:1.85vh;font-weight:800;width:12vh;text-align:center;color:var(--muted);flex-shrink:0;}
+  .linha .rec.recebeu{color:#1bff9c;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45);}
+  /* cabecalho de colunas do slide Geral */
+  .ranking .lhead{display:flex;align-items:center;gap:1vw;padding:0 1vw .4vh;font-size:1.3vh;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+  .ranking .lhead .pos{width:4.5vh;}
+  .ranking .lhead .lh-foto{width:6.1vh;flex-shrink:0;}
+  .ranking .lhead .info{flex:1;min-width:0;text-align:center;}
+  .ranking .lhead .lh-bar{flex:1.4;}
+  .ranking .lhead .qtd{width:5.4vh;text-align:center;flex-shrink:0;}
+  .ranking .lhead .rec{width:12vh;text-align:center;flex-shrink:0;}
   .grafico{flex:1;display:flex;align-items:flex-end;justify-content:space-around;gap:.6vw;padding-top:2vh;min-height:0;}
   .gcol{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;flex:1;gap:.5vh;}
   .gcol .gbar{width:62%;max-width:5vw;border-radius:.8vh .8vh 0 0;transition:height .8s;min-height:.4vh;display:flex;align-items:flex-start;justify-content:center;}
@@ -400,7 +410,8 @@ function slideDiasAnteriores(){
   const max=Math.max(1,...arr.map(a=>a.total));
   // mesma logica da barra de progresso: cor pelo preenchimento (ate 40% amarelo, ate 80% azul, acima verde)
   const corFill=pct=>pct<=.4?'#f1c40f':pct<=.8?'#3b82f6':'#00d084';
-  return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};const pct=a.total/max;return `<div class="linha${i<3?' pod'+(i+1):''}"><div class="pos">${i+1}º</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div></div><div class="barra"><i style="width:${pct*100}%;background:${corFill(pct)}"></i></div><div class="qtd">${a.total}</div></div>`;}).join('')+'</div>';
+  const head='<div class="lhead"><div class="pos"></div><div class="lh-foto"></div><div class="info">Vendedor</div><div class="lh-bar"></div><div class="qtd">Matr.</div><div class="rec">Recebido</div></div>';
+  return '<div class="ranking">'+head+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};const pct=a.total/max;return `<div class="linha${i<3?' pod'+(i+1):''}"><div class="pos">${i+1}º</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div></div><div class="barra"><i style="width:${pct*100}%;background:${corFill(pct)}"></i></div><div class="qtd">${a.total}</div><div class="rec${a.rec>0?' recebeu':''}">${a.rec>0?fmtBRL(a.rec):'-'}</div></div>`;}).join('')+'</div>';
 }
 function slideLigas(){
   const {porVend}=stats();
