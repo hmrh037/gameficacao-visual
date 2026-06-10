@@ -67,13 +67,13 @@
   .tag .pulse{width:.9vh;height:.9vh;}
 
   /* TABELA RANKING */
-  .thead{display:grid;grid-template-columns:4vh 5vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.7vh 1vw;font-size:1.3vh;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);background:rgba(150,140,230,.08);border-radius:.8vh;}
+  .thead{display:grid;grid-template-columns:4vh 5vh minmax(0,1.8fr) 7vh 13vh minmax(0,1fr);gap:1vw;align-items:center;padding:.7vh 1vw;font-size:1.3vh;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);background:rgba(150,140,230,.08);border-radius:.8vh;border:1px solid transparent;}
   .thead .r{text-align:right;}
   .thead .c{text-align:center;}
   .thead .vh{padding-left:calc(5.4vh + .8vw);}
   .t-medal{display:flex;align-items:center;justify-content:center;}
   .ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.4vh;margin-top:.6vh;}
-  .trow{display:grid;grid-template-columns:4vh 5vh 1.8fr 7vh 13vh 1fr;gap:1vw;align-items:center;padding:.55vh 1vw;border-radius:1vh;border:1px solid transparent;transition:background .2s,transform .2s;}
+  .trow{display:grid;grid-template-columns:4vh 5vh minmax(0,1.8fr) 7vh 13vh minmax(0,1fr);gap:1vw;align-items:center;padding:.55vh 1vw;border-radius:1vh;border:1px solid transparent;transition:background .2s,transform .2s;}
   .trow:nth-child(even){background:rgba(150,140,230,.045);}
   .ranking .trow.pod1{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);border-color:rgba(212,175,55,.32);}
   .t-rank{font-size:2.4vh;font-weight:900;color:var(--muted);text-align:center;}
