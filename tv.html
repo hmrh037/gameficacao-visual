@@ -376,8 +376,8 @@ function slideEquipes(){
   const maxQ=Math.max(1,...arr.map(a=>a.qtd));const ord=[...arr].sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
   return '<div class="ranking">'+ord.map((a,i)=>`<div class="linha" style="flex-direction:column;align-items:stretch;gap:.7vh">
     <div style="display:flex;align-items:center;gap:1vw">
-      <div class="pos" style="width:auto">${i===0?'👑':(i+1)+'º'}</div>
-      <div class="nm" style="color:${a.e.cor};flex:1;font-size:2.3vh">🛡️ ${a.e.nome}</div>
+      <div class="pos" style="width:auto">${i+1}º</div>
+      <div class="nm" style="color:${a.e.cor};flex:1;font-size:2.3vh">${a.e.nome}</div>
       <div style="text-align:right;font-size:1.7vh;font-weight:700"><span style="color:var(--gold)">${a.qtd}</span> matr. · <span style="color:var(--green)">${fmtBRL(a.rec)}</span></div>
     </div>
     <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
@@ -401,7 +401,7 @@ function slideLigas(){
 const SLIDES=[
   {t:'Gráfico de Vendas',f:slideGraficoVendas},
   {t:'Recebimentos',f:slideGraficoReceb},
-  {t:'Equipes — quem está na frente',f:slideEquipes},
+  {t:'Equipes',f:slideEquipes},
   {t:'Geral',f:slideDiasAnteriores},
   {t:'Ligas',f:slideLigas}
 ];
