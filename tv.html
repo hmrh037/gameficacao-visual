@@ -383,10 +383,10 @@ function slideEquipes(){
     </div>
     <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
 }
-// Geral: puxa o que ja esta registrado -> contagem das matriculas registradas (qualquer dia), SEM somar o campo manual.
+// Geral (acumulado): vendas manuais (vendasAnteriores) + TODAS as matriculas registradas (qualquer dia).
 // Se o vendedor tem matricula registrada, aparece. So exibicao — NAO entra no ranking/meta do dia.
 function slideDiasAnteriores(){
-  let arr=vendedores.map(v=>{const total=matriculas.filter(m=>m.vendedorId===v.id).length;return {v,total};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total);
+  let arr=vendedores.map(v=>{const ant=Number(v.vendasAnteriores)||0;const reg=matriculas.filter(m=>m.vendedorId===v.id).length;return {v,ant,reg,total:ant+reg};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total);
   if(!arr.length)return '<div class="vazio">Sem vendas de dias anteriores cadastradas no painel.</div>';
   const max=Math.max(1,...arr.map(a=>a.total));
   // mesma logica da barra de progresso: cor pelo preenchimento (ate 40% amarelo, ate 80% azul, acima verde)
