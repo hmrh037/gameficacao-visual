@@ -11,7 +11,7 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Satoshi','Inter','Segoe UI',system-ui,Arial,sans-serif;}
   :root{--bg:#0f111a;--bg2:#1e233a;--card:#161a2b;--border:rgba(255,255,255,.07);--text:#f1f5f9;--muted:#8b95a7;--gold:#d4af37;--green:#00d084;--red:#ff4757;}
-  html,body{height:100%;background:radial-gradient(1300px 800px at 80% -15%, #1a2036, var(--bg));color:var(--text);overflow:hidden;}
+  html,body{height:100%;background:linear-gradient(to right,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/6rem 4rem,linear-gradient(to bottom,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/6rem 4rem,radial-gradient(ellipse 80% 80% at 50% -10%,rgba(120,119,198,.32),transparent 70%),#0a0a0a;color:var(--text);overflow:hidden;}
   .mono,.t-rank,.t-qtd,.t-rec,.linha .qtd,.gcol .gbar .gv,.valor-r,.forma-r,.ultra-banner .nm{font-family:'JetBrains Mono',ui-monospace,'Courier New',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
   ::-webkit-scrollbar{width:8px;height:8px;}
   ::-webkit-scrollbar-track{background:transparent;}
@@ -135,7 +135,7 @@
   .pulse{width:1.1vh;height:1.1vh;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 0 rgba(0,208,132,.6);animation:pulseRing 1.5s ease-in-out infinite;}
   @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,208,132,.7);transform:scale(1);}70%{box-shadow:0 0 0 1.5vh rgba(0,208,132,0);transform:scale(1.25);}100%{box-shadow:0 0 0 0 rgba(0,208,132,0);transform:scale(1);}}
 
-  #iniciar{position:fixed;inset:0;background:radial-gradient(900px 600px at 50% 30%, #1a2036, var(--bg));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vh;z-index:200;text-align:center;padding:5vw;}
+  #iniciar{position:fixed;inset:0;background:radial-gradient(ellipse 80% 80% at 50% -10%,rgba(120,119,198,.32),transparent 70%),#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vh;z-index:200;text-align:center;padding:5vw;}
   #iniciar .logo{font-size:11vh;width:18vh;height:18vh;display:flex;align-items:center;justify-content:center;}
   #iniciar .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 40px rgba(192,132,252,.55));}
   #iniciar h1{font-size:4vh;font-weight:900;letter-spacing:1px;}#iniciar h1 span{color:var(--gold);}
