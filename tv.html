@@ -440,7 +440,6 @@ function renderPodio(){
     const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
     return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
       <div class="pod-rank">${pos}º</div>
-      <div class="pod-med">${medalHTML(a.qtd,'medal-pod')||med[pos]}</div>
       <div class="pod-av">${foto}</div>
       <div class="pod-nm">${a.v.nome}</div>
       <div class="pod-eq" style="color:${eq.cor}">${eq.nome}</div>
