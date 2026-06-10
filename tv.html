@@ -392,7 +392,8 @@ function slideLigas(){
   const {porVend}=stats();
   const cont=TIERS.map(()=>0);
   vendedores.forEach(v=>{const q=porVend[v.id]?porVend[v.id].qtd:0;const i=tierIdx(q);if(i>=0)cont[i]++;});
-  const ordem=TIERS.map((t,i)=>({t,n:cont[i]})).reverse(); // mais forte primeiro, Bronze por ultimo
+  const arr=TIERS.map((t,i)=>({t,n:cont[i]})); // Bronze(fraco) -> Unreal(forte)
+  const ordem=[...arr.slice(4),...arr.slice(0,4)]; // cima: Diamond..Unreal (forte no canto sup.dir.) | baixo: Bronze..Platinum (fraco no canto inf.esq.)
   return '<div class="ladder">'+ordem.map(({t,n})=>`<div class="lad"><div class="lad-medal"><img class="medal-l" src="${t.img}" onerror="medalFallback(this,'${t.nome}','${t.cor}')"/></div><div class="lad-nm" style="color:${t.cor}">${t.nome}</div><div class="lad-ct">${n}</div></div>`).join('')+'</div>';
 }
 const SLIDES=[
