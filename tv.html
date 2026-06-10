@@ -29,8 +29,6 @@
   .brand h1{font-size:2.9vh;font-weight:900;letter-spacing:1px;line-height:1;}
   .brand h1 span{color:var(--gold);}
   .brand .sub{display:inline-flex;align-items:center;gap:.7vw;font-size:1.15vh;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:.6vh;}
-  .sub .ranks{display:inline-flex;align-items:center;gap:.32vw;}
-  .sub .ranks img{height:2vh;width:auto;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));}
   .navright{display:flex;align-items:center;}
 
   /* PÓDIO TOP 3 */
@@ -97,9 +95,9 @@
   .medal-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;border-radius:50%;line-height:1;}
   .medal-none{filter:grayscale(1) brightness(.7) opacity(.45);}
   .medal-traco{display:inline-flex;align-items:center;justify-content:center;color:var(--muted);font-weight:900;font-size:2.6vh;line-height:1;}
-  .ladder{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vh .6vw;align-content:center;padding:1vh 0;}
-  .lad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;}
-  .medal-l{width:8.5vh;height:8.5vh;object-fit:cover;border-radius:50%;font-size:3.6vh;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
+  .ladder{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:.5vh .6vw;align-content:center;padding:.3vh 0;}
+  .lad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3vh;}
+  .medal-l{width:6vh;height:6vh;object-fit:cover;border-radius:50%;font-size:3vh;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
   .lad-nm{font-size:1.6vh;font-weight:800;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
   .lad-ct{font-size:2.5vh;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--text);}
   .t-nm small{display:block;font-size:1.4vh;font-weight:700;}
@@ -219,7 +217,7 @@
 <div id="painel" class="hidden">
   <header class="nav">
     <div class="brand"><span class="logo"><img src="tiers/unreal.png" alt="Unreal" onerror="this.replaceWith(document.createTextNode('🏆'))"/></span>
-      <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking <span class="ranks"><img src="tiers/bronze.png" alt="" onerror="this.remove()"/><img src="tiers/silver.png" alt="" onerror="this.remove()"/><img src="tiers/gold.png" alt="" onerror="this.remove()"/><img src="tiers/platinum.png" alt="" onerror="this.remove()"/><img src="tiers/diamond.png" alt="" onerror="this.remove()"/><img src="tiers/elite.png" alt="" onerror="this.remove()"/><img src="tiers/champion.png" alt="" onerror="this.remove()"/><img src="tiers/unreal.png" alt="" onerror="this.remove()"/></span></div></div>
+      <div><h1>GRUPO <span>VISUAL</span></h1><div class="sub">Ranking de Vendas</div></div>
     </div>
     <div class="navright"><span class="tag"><span class="pulse"></span>AO VIVO</span></div>
   </header>
@@ -403,7 +401,8 @@ const SLIDES=[
   {t:'💰 Gráfico de Recebimentos',f:slideGraficoReceb},
   {t:'🏆 Ranking de Recebimentos',f:slideRankReceb},
   {t:'🛡️ Equipes — quem está na frente',f:slideEquipes},
-  {t:'📅 Acumulado — dias anteriores + hoje',f:slideDiasAnteriores}
+  {t:'📅 Acumulado — dias anteriores + hoje',f:slideDiasAnteriores},
+  {t:'🏅 Ligas — vendedores por liga',f:slideLigas}
 ];
 let slideIdx=0;
 function renderSlide(){
