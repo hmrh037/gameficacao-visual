@@ -114,7 +114,8 @@
   .slidedots i{width:1.1vh;height:1.1vh;border-radius:50%;background:var(--border);transition:background .3s;}
   .slidedots i.on{background:var(--gold);}
   .slidebox{flex:1;display:flex;flex-direction:column;min-height:0;}
-  .slidebox>.grafico,.slidebox>.ranking{flex:1;}
+  .slidebox>.grafico{flex:1;}
+  .slidebox>.ranking{flex:1;overflow:hidden;}
   .slidebox.fadein{animation:slideFade .5s ease;}
   @keyframes slideFade{from{opacity:0;transform:translateY(1.4vh);}to{opacity:1;transform:translateY(0);}}
   /* linhas usadas DENTRO dos slides */
@@ -385,7 +386,7 @@ function slideEquipes(){
 // Acumulado: vendas de dias anteriores (manual) + hoje (matriculas). So exibicao — NAO entra no ranking/meta do dia
 function slideDiasAnteriores(){
   const hoje=hojeStr();
-  let arr=vendedores.map(v=>{const ant=Number(v.vendasAnteriores)||0;const hj=matriculas.filter(m=>m.vendedorId===v.id&&m.data===hoje).length;return {v,ant,hj,total:ant+hj};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total).slice(0,6);
+  let arr=vendedores.map(v=>{const ant=Number(v.vendasAnteriores)||0;const hj=matriculas.filter(m=>m.vendedorId===v.id&&m.data===hoje).length;return {v,ant,hj,total:ant+hj};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total);
   if(!arr.length)return '<div class="vazio">Sem vendas de dias anteriores cadastradas no painel.</div>';
   const max=Math.max(1,...arr.map(a=>a.total));
   return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${i+1}º</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div></div><div class="barra"><i style="width:${a.total/max*100}%;background:${eq.cor}"></i></div><div class="qtd">${a.total}</div></div>`;}).join('')+'</div>';
@@ -562,7 +563,43 @@ function checarInatividade(){
 setInterval(checarInatividade,20000);
 
 function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();}
-setInterval(proximoSlide,7000);
+// ---- rodizio de slides: o slide "Geral" ganha tempo extra e roda a mesma
+//      animacao de rolagem da tabela principal (desce devagar -> pausa -> volta) antes de trocar.
+const SLIDE_MS=7000;
+let slideTimer=null,slideScrollAnim=null;
+function animarScrollSlide(el,destino,dur,cb){
+  if(slideScrollAnim)clearInterval(slideScrollAnim);
+  const ini=el.scrollTop,dist=destino-ini;
+  if(Math.abs(dist)<1){el.scrollTop=destino;if(cb)cb();return;}
+  const t0=Date.now();
+  slideScrollAnim=setInterval(()=>{
+    const p=Math.min(1,(Date.now()-t0)/dur);
+    const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2; // easeInOut (igual a tabela)
+    el.scrollTop=ini+dist*e;
+    if(p>=1){clearInterval(slideScrollAnim);slideScrollAnim=null;if(cb)cb();}
+  },16);
+}
+function agendarSlide(){
+  if(slideTimer)clearTimeout(slideTimer);
+  if(slideScrollAnim){clearInterval(slideScrollAnim);slideScrollAnim=null;}
+  let espera=SLIDE_MS;
+  const s=SLIDES[slideIdx%SLIDES.length];
+  if(s&&s.f===slideDiasAnteriores){
+    const el=document.querySelector('#slideBox .ranking');
+    if(el){
+      const max=el.scrollHeight-el.clientHeight;
+      if(max>6){ // ha vendedores escondidos -> rola devagar antes de trocar
+        const dur=Math.max(4000,max*22);
+        espera=2200+dur+1500+3000+600; // ve o topo, desce, pausa, volta, respiro
+        setTimeout(()=>animarScrollSlide(el,max,dur,()=>{
+          setTimeout(()=>animarScrollSlide(el,0,3000),1500);
+        }),2200);
+      }
+    }
+  }
+  slideTimer=setTimeout(()=>{proximoSlide();agendarSlide();},espera);
+}
+agendarSlide();
 
 // ---- rolagem lenta da tabela de Colocacoes (a cada 30s revela os demais) ----
 let rankAnim=null;
