@@ -395,7 +395,7 @@ function slideEquipes(){
 }
 // Geral: quantidade geral de matriculas, lancada MANUALMENTE no painel (campo qtdGeral). So exibicao — NAO entra na meta do dia.
 function slideDiasAnteriores(){
-  let arr=vendedores.map(v=>{const total=Number(v.qtdGeral)||0;return {v,total};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total);
+  let arr=vendedores.map(v=>{const total=Number(v.qtdGeral)||0;const rec=Number(v.recGeral)||0;return {v,total,rec};}).filter(a=>a.total>0).sort((a,b)=>b.total-a.total||b.rec-a.rec);
   if(!arr.length)return '<div class="vazio">Nenhuma quantidade geral lançada no painel.</div>';
   const max=Math.max(1,...arr.map(a=>a.total));
   // mesma logica da barra de progresso: cor pelo preenchimento (ate 40% amarelo, ate 80% azul, acima verde)

@@ -240,11 +240,12 @@ function renderAdmin(){
         <span class="lcl" style="margin-top:2px">Hoje: ${recHoje(v.id)} recebimento(s) · ${fmtBRL(recTotHoje(v.id))}</span>
       </div>
       <div class="lc">
-        <span class="lcl">📊 Qtd. geral de matrículas (manual)</span>
+        <span class="lcl">📊 Geral (manual) — matrículas e recebimento</span>
         <div class="step">
-          <input class="sn" style="width:90px" type="number" min="0" step="1" value="${Number(v.qtdGeral)||0}" onchange="setQtdGeral(${v.id},this.value)"/>
+          <input class="sn" style="width:84px" type="number" min="0" step="1" value="${Number(v.qtdGeral)||0}" onchange="setQtdGeral(${v.id},this.value)" title="Quantidade geral de matrículas"/>
+          <input class="sn" style="width:120px" type="text" inputmode="decimal" placeholder="R$ 0,00" value="${(Number(v.recGeral)||0)>0?fmtBRL(Number(v.recGeral)):''}" onchange="setRecGeral(${v.id},this.value)" title="Recebimento geral"/>
         </div>
-        <span class="lcl" style="margin-top:2px">lançado à mão · aparece no slide "Geral" das TVs · não conta na meta do dia</span>
+        <span class="lcl" style="margin-top:2px">matrículas · recebimento — lançado à mão · aparece no slide "Geral" das TVs · não conta na meta do dia</span>
       </div>
     </div>`).join(''):'<div class="hint">Cadastre vendedores abaixo primeiro.</div>';
   document.getElementById('tabVend').innerHTML=vendedores.map(v=>{const eq=getEq(v.equipeId)||{nome:'—',cor:'#888'};const qtd=matriculas.filter(m=>m.vendedorId===v.id).length;
@@ -261,6 +262,7 @@ function renderAdmin(){
 }
 function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEquipes();renderAdmin();}}
 function setQtdGeral(id,val){const v=getVend(id);if(v){v.qtdGeral=Math.max(0,parseInt(val)||0);salvarVendedores();renderAdmin();}}
+function setRecGeral(id,val){const v=getVend(id);if(v){let s=String(val).trim();if(s.indexOf(',')>-1)s=s.replace(/\./g,'').replace(',','.');v.recGeral=Math.max(0,parseFloat(s)||0);salvarVendedores();renderAdmin();}}
 const PALETA=["#2563eb","#ef4444","#22c55e","#a855f7","#f59e0b","#ec4899","#06b6d4","#84cc16"];
 function addEquipe(){const cor=PALETA[equipes.length%PALETA.length];equipes.push({id:uid(),nome:'Equipe '+(equipes.length+1),cor,meta:0});salvarEquipes();renderAdmin();toast('Equipe adicionada');}
 function delEquipe(id){if(equipes.length<=1){alert('É preciso ter pelo menos uma equipe.');return;}const temVend=vendedores.some(v=>v.equipeId===id);if(temVend&&!confirm('Esta equipe tem vendedores. Remover mesmo assim? (os vendedores ficarão sem equipe)')) return;else if(!temVend&&!confirm('Remover esta equipe?'))return;equipes=equipes.filter(e=>e.id!==id);salvarEquipes();renderAdmin();}
