@@ -401,7 +401,7 @@ function slideEquipes(){
     <div style="display:flex;align-items:center;gap:1vw">
       <div class="pos" style="width:auto">${i+1}º</div>
       <div class="nm" style="color:${a.e.cor};flex:1;font-size:2.3vh">${a.e.nome}</div>
-      <div style="text-align:right;font-size:1.7vh;font-weight:700"><span style="color:var(--gold)">${a.qtd}</span> matr. · <span style="color:var(--green)">${fmtBRL(a.rec)}</span></div>
+      <div style="text-align:right;font-size:1.7vh;font-weight:700"><span style="color:var(--gold)">${a.qtd}</span> matr. · <span style="${a.rec>0?'color:#1bff9c;text-shadow:0 0 4px rgba(0,255,150,.95),0 0 11px rgba(0,230,140,.7),0 0 20px rgba(0,208,132,.45)':'color:var(--muted)'}">${fmtBRL(a.rec)}</span></div>
     </div>
     <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
 }
