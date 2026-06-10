@@ -263,6 +263,8 @@ function renderAdmin(){
 function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEquipes();renderAdmin();}}
 function setQtdGeral(id,val){const v=getVend(id);if(v){v.qtdGeral=Math.max(0,parseInt(val)||0);salvarVendedores();renderAdmin();}}
 function setRecGeral(id,val){const v=getVend(id);if(v){let s=String(val).trim();if(s.indexOf(',')>-1)s=s.replace(/\./g,'').replace(',','.');v.recGeral=Math.max(0,parseFloat(s)||0);salvarVendedores();renderAdmin();}}
+// acumula no total geral (qtdGeral / recGeral). delta pode ser negativo (remocao/correcao). nunca abaixo de 0.
+function bumpGeral(vendedorId,campo,delta){if(!delta)return;const v=getVend(vendedorId);if(v){v[campo]=Math.max(0,(Number(v[campo])||0)+delta);salvarVendedores();}}
 const PALETA=["#2563eb","#ef4444","#22c55e","#a855f7","#f59e0b","#ec4899","#06b6d4","#84cc16"];
 function addEquipe(){const cor=PALETA[equipes.length%PALETA.length];equipes.push({id:uid(),nome:'Equipe '+(equipes.length+1),cor,meta:0});salvarEquipes();renderAdmin();toast('Equipe adicionada');}
 function delEquipe(id){if(equipes.length<=1){alert('É preciso ter pelo menos uma equipe.');return;}const temVend=vendedores.some(v=>v.equipeId===id);if(temVend&&!confirm('Esta equipe tem vendedores. Remover mesmo assim? (os vendedores ficarão sem equipe)')) return;else if(!temVend&&!confirm('Remover esta equipe?'))return;equipes=equipes.filter(e=>e.id!==id);salvarEquipes();renderAdmin();}
@@ -323,18 +325,19 @@ function comprimir(file,cb){const r=new FileReader();r.onload=e=>{const img=new 
   removerFundo(ctx,size); // 3) deixa o fundo (ligado as bordas) transparente
   cb(c.toDataURL('image/png'));
 };img.src=e.target.result;};r.readAsDataURL(file);}
-function delMatricula(id){const m=matriculas.find(x=>x.id===id);const v=m?getVend(m.vendedorId):null;if(!confirm('Excluir esta matrícula'+(v?' de '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;matriculas=matriculas.filter(x=>x.id!==id);salvarMatriculas();renderAdmin();}
+function delMatricula(id){const m=matriculas.find(x=>x.id===id);const v=m?getVend(m.vendedorId):null;if(!confirm('Excluir esta matrícula'+(v?' de '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;matriculas=matriculas.filter(x=>x.id!==id);salvarMatriculas();if(m)bumpGeral(m.vendedorId,'qtdGeral',-1);renderAdmin();}
 function addMat(vendedorId,delta){
   if(delta>0){ lancarUmaMat(vendedorId); }
   else { // remove a matrícula mais recente de hoje
     const hoje=hojeStr();
     const mine=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hoje).sort((a,b)=>b.dt-a.dt);
-    if(mine[0]){ matriculas=matriculas.filter(m=>m.id!==mine[0].id); salvarMatriculas(); renderAdmin(); }
+    if(mine[0]){ matriculas=matriculas.filter(m=>m.id!==mine[0].id); salvarMatriculas(); bumpGeral(vendedorId,'qtdGeral',-1); renderAdmin(); }
   }
 }
 function lancarUmaMat(vendedorId){
   const m={id:uid(),vendedorId,valor:Number(config.valorMatricula)||0,data:hojeStr(),dt:Date.now()};
   matriculas.push(m);salvarMatriculas();
+  bumpGeral(vendedorId,'qtdGeral',1); // soma no total geral
   if(db) db.ref('painel/celebra').set({vendedorId,ts:Date.now(),id:m.id}); // dispara comemoracao nas TVs
   renderAdmin();
   const v=getVend(vendedorId);toast('🎉 Matrícula lançada para '+(v?v.nome:''));
@@ -353,6 +356,7 @@ function setMat(vendedorId,val){
     matriculas=matriculas.filter(m=>rem.indexOf(m.id)<0);
     salvarMatriculas();
   }
+  bumpGeral(vendedorId,'qtdGeral',diff); // ajusta total geral pelo delta
   renderAdmin();
 }
 function addRecebimento(vendedorId){
@@ -365,12 +369,13 @@ function addRecebimento(vendedorId){
   if(valor<=0){alert('Informe o valor do recebimento.');return;}
   const r={id:uid(),vendedorId,valor,forma,data:hojeStr(),dt:Date.now()};
   recebimentos.push(r);salvarRecebimentos();
+  bumpGeral(vendedorId,'recGeral',valor); // soma no recebimento geral
   if(db) db.ref('painel/recebe').set({vendedorId,valor,forma,ts:Date.now(),id:r.id}); // dispara comemoracao de recebimento nas TVs
   if(inp)inp.value='';
   renderAdmin();
   const vd=getVend(vendedorId);toast('💰 '+forma+' de '+fmtBRL(valor)+' — '+(vd?vd.nome:''));
 }
-function delRecebimento(id){const r=recebimentos.find(x=>x.id===id);const v=r?getVend(r.vendedorId):null;if(!confirm('Excluir este recebimento'+(r?' de '+fmtBRL(r.valor):'')+(v?' — '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;recebimentos=recebimentos.filter(x=>x.id!==id);salvarRecebimentos();renderAdmin();}
+function delRecebimento(id){const r=recebimentos.find(x=>x.id===id);const v=r?getVend(r.vendedorId):null;if(!confirm('Excluir este recebimento'+(r?' de '+fmtBRL(r.valor):'')+(v?' — '+v.nome:'')+'?\n\nEssa ação não pode ser desfeita.'))return;recebimentos=recebimentos.filter(x=>x.id!==id);salvarRecebimentos();if(r)bumpGeral(r.vendedorId,'recGeral',-r.valor);renderAdmin();}
 iniciar();renderAdmin();
 </script>
 </body>
