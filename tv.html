@@ -37,12 +37,9 @@
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.1vh 6vw 0;}
   .pod{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;position:relative;isolation:isolate;}
-  /* feixe de luz (spotlight) descendo do topo na cor da posicao (--pc) */
-  .pod::before,.pod::after{content:"";position:absolute;left:50%;transform:translateX(-50%);pointer-events:none;z-index:-1;}
-  .pod::before{top:1vh;width:80%;height:97%;background:linear-gradient(180deg,var(--pc,#fff),transparent 72%);opacity:.32;clip-path:polygon(41% 0,59% 0,100% 100%,0 100%);filter:blur(9px);}
-  .pod::after{top:-1.2vh;width:11vh;height:5.5vh;background:radial-gradient(ellipse at center,var(--pc,#fff) 0%,transparent 62%);opacity:.7;filter:blur(5px);}
-  .pod-1::before{opacity:.4;}
-  .pod-1::after{opacity:.85;width:13vh;height:6.5vh;}
+  /* cortina de luz retangular atras de cada posicao: do topo ate encostar no pedestal, na cor da posicao (--pc) */
+  .pod::before{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:60%;height:100%;background:linear-gradient(180deg,var(--pc,#fff) 0%,transparent 90%);opacity:.32;filter:blur(15px);pointer-events:none;z-index:-1;}
+  .pod-1::before{opacity:.4;width:64%;}
   .pod-rank{position:absolute;top:3.5vh;left:.4vw;font-size:5.5vh;font-weight:900;line-height:1;color:var(--pc,#888);text-shadow:0 .4vh 1.2vh rgba(0,0,0,.7),0 0 2vh var(--pc,#000);z-index:5;pointer-events:none;}
   .pod-1 .pod-rank{font-size:7.5vh;top:4vh;}
   .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;display:flex;align-items:center;justify-content:center;visibility:hidden;}
