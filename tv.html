@@ -332,7 +332,7 @@ function renderRanking(){
   el.innerHTML=resto.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};
     const ic=a.v.foto?`<span class="t-ic"><img src="${a.v.foto}"/></span>`:`<span class="t-ic" style="background:${eq.cor}">${iniciais(a.v.nome)}</span>`;
     return `<div class="trow" data-vid="${a.v.id}">
-      <span class="t-rank">${i+1}</span>
+      <span class="t-rank">${a.qtd>0?(i+1):'-'}</span>
       <span class="t-vend">${medalHTML(a.qtd,'medal-r')}${ic}<span class="t-nm">${a.v.nome}<small style="color:${eq.cor}">${eq.nome}</small></span></span>
       <span class="t-qtd">${a.qtd}</span>
       <span class="t-rec${a.rec>0?' recebeu':''}">${fmtBRL(a.rec)}</span>
