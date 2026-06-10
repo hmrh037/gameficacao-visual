@@ -343,7 +343,7 @@ function iniciais(n){return (n||'').trim().split(/\s+/).map(p=>p[0]||'').slice(0
 // cor da barra pela qtd de matriculas: amarelo (1-2) -> azul (3-4) -> verde (5+)
 function corBarra(q){return q<=2?'#f1c40f':q<=4?'#3b82f6':'#00d084';}
 function renderRanking(){
-  const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);const max=Math.max(1,...arr.map(a=>a.qtd));
+  const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);const max=Math.max(1,...arr.map(a=>a.qtd));
   const el=document.getElementById('ranking');
   const resto=arr; // todos os vendedores, do 1o lugar em diante
   if(!resto.length){el.innerHTML='<div class="vazio">Nenhuma colocação no período ainda.</div>';return;}
@@ -373,7 +373,7 @@ function slideGraficoReceb(){
   return '<div class="grafico">'+arr.map(a=>colBar(a.v.foto,a.v.nome,a.rec/max*100,'#00d084','<span style="font-size:1.4vh">'+fmtBRL(a.rec)+'</span>')).join('')+'</div>';
 }
 function slideRankVendas(){
-  const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor).slice(0,6);const max=Math.max(1,...arr.map(a=>a.qtd));
+  const {porVend}=stats();let arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec).slice(0,6);const max=Math.max(1,...arr.map(a=>a.qtd));
   if(!arr.length)return '<div class="vazio">Sem vendas no período.</div>';
   return '<div class="ranking">'+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};return `<div class="linha"><div class="pos">${medalha(i)}</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${Math.min(a.qtd,5)/5*100}%;background:${corBarra(a.qtd)}"></i></div><div class="qtd">${a.qtd}</div></div>`;}).join('')+'</div>';
 }
@@ -430,7 +430,7 @@ function renderSlide(){
 function proximoSlide(){slideIdx=(slideIdx+1)%SLIDES.length;renderSlide();}
 function renderPodio(){
   const {porVend}=stats();
-  const arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor);
+  const arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
   const cont=document.getElementById('podio');if(!cont)return;
   if(!arr.length){cont.innerHTML='<div class="vazio" style="width:100%">Aguardando resultados...</div>';return;}
   const med={1:'🥇',2:'🥈',3:'🥉'},cor={1:'#d4af37',2:'#cbd5e1',3:'#cd7f32'};
@@ -456,16 +456,24 @@ function renderPainel(){renderPodio();renderRanking();renderSlide();}
 
 // ---- ultrapassagem no ranking ----
 let ultraTimer=null;
-function currentOrder(){const {porVend}=stats();return Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.valor-a.valor).map(a=>a.v.id);}
+function currentOrder(){const {porVend}=stats();return Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec).map(a=>({id:a.v.id,qtd:a.qtd,rec:a.rec}));}
+// x esta ESTRITAMENTE a frente de y: mais matriculas, ou empate em matriculas com mais recebimento.
+// Empate puro (mesmas matriculas e mesmo recebimento) NAO conta como ultrapassagem.
+function ultraMelhor(a,b){return a.qtd>b.qtd||(a.qtd===b.qtd&&a.rec>b.rec);}
 function checarUltra(){
   const ord=currentOrder();
   if(prevOrder){
+    const pm={};prevOrder.forEach((o,idx)=>{pm[o.id]={qtd:o.qtd,rec:o.rec,idx};});
     for(let i=0;i<ord.length;i++){
-      const x=ord[i],ant=prevOrder.indexOf(x);
-      if(ant>i){ // x subiu de posição
+      const x=ord[i],px=pm[x.id];
+      if(px&&px.idx>i){ // x subiu de posição
         let passado=null;
-        for(let j=i+1;j<ord.length;j++){const y=ord[j],antY=prevOrder.indexOf(y);if(antY>-1&&antY<ant){passado=y;break;}}
-        if(passado!=null){const X=x,Y=passado;setTimeout(()=>mostrarUltrapassagem(X,Y),1200);break;}
+        for(let j=i+1;j<ord.length;j++){
+          const y=ord[j],py=pm[y.id];
+          // y estava acima de x antes E agora x esta estritamente a frente (nao so empatado)
+          if(py&&py.idx<px.idx&&ultraMelhor(x,y)){passado=y.id;break;}
+        }
+        if(passado!=null){const X=x.id,Y=passado;setTimeout(()=>mostrarUltrapassagem(X,Y),1200);break;}
       }
     }
   }
