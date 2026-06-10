@@ -304,7 +304,7 @@ let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=tr
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,volComemoracao:100,periodo:'hoje'};
+let prevOrder=null,ultraPronto=false,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,volComemoracao:100,periodo:'hoje'};
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
 
@@ -497,8 +497,8 @@ function ultraMelhor(a,b){return a.qtd>b.qtd||(a.qtd===b.qtd&&a.rec>b.rec);}
 // e agora x ficou estritamente a frente. So entre os dois que estavam empatados (nada de pular do nada).
 function checarUltra(){
   const ord=currentOrder();
-  // so anima com o painel aberto; durante o carregamento dos dados apenas atualiza a base (sem disparar)
-  if(painelAtivo&&prevOrder){
+  // so dispara depois que o painel abriu E os dados assentaram (ultraPronto); ate la so atualiza a base
+  if(ultraPronto&&prevOrder){
     const prev={};prevOrder.forEach(o=>{prev[o.id]=o;});
     let par=null;
     for(const x of ord){
@@ -618,7 +618,9 @@ function checarInatividade(){
 }
 setInterval(checarInatividade,20000);
 
-function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}rebaseOrder();renderPainel();}
+function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();
+  // so habilita a ultrapassagem depois que os dados do Firebase assentam (evita falso positivo no F5/carregamento)
+  ultraPronto=false;setTimeout(()=>{rebaseOrder();ultraPronto=true;},5000);}
 // ---- rodizio de slides: o slide "Geral" ganha tempo extra e roda a mesma
 //      animacao de rolagem da tabela principal (desce devagar -> pausa -> volta) antes de trocar.
 const SLIDE_MS=7000;
