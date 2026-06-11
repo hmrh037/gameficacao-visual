@@ -432,7 +432,7 @@ function slideDiasAnteriores(){
   // mesma logica da barra de progresso: cor pelo preenchimento (ate 40% amarelo, ate 80% azul, acima verde)
   const corFill=pct=>pct<=.4?'#f1c40f':pct<=.8?'#3b82f6':'#00d084';
   const head='<div class="lhead"><div class="pos"></div><div class="lh-foto"></div><div class="info">Vendedor</div><div class="lh-bar"></div><div class="qtd">Matr.</div><div class="rec">Recebido</div></div>';
-  return '<div class="ranking">'+head+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};const slug=(eq.nome||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');const pct=a.total/max;return `<div class="linha${i<3?' pod'+(i+1):''}${slug?' time-'+slug:''}"><div class="pos">${i+1}º</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div></div><div class="barra"><i style="width:${pct*100}%;background:${corFill(pct)}"></i></div><div class="qtd">${a.total}</div><div class="rec${a.rec>0?' recebeu':''}">${a.rec>0?fmtBRL(a.rec):'-'}</div></div>`;}).join('')+'</div>';
+  return '<div class="ranking">'+head+arr.map((a,i)=>{const eq=getEq(a.v.equipeId)||{nome:'',cor:'#888'};const slug=(eq.nome||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');const pct=a.total/max;return `<div class="linha${i<3?' pod'+(i+1):''}${slug?' time-'+slug:''}"><div class="pos">${i+1}º</div>${fotoMini(a.v)}<div class="info"><div class="nm">${a.v.nome}</div><div class="eqtag" style="color:${eq.cor}">${eq.nome}</div></div><div class="barra"><i style="width:${pct*100}%;background:${corFill(pct)}"></i></div><div class="qtd">${a.total}</div><div class="rec${a.rec>0?' recebeu':''}">${a.rec>0?fmtBRL(a.rec):'-'}</div></div>`;}).join('')+'</div>';
 }
 function slideLigas(){
   const {porVend}=stats();
