@@ -509,9 +509,6 @@ function checarUltra(){
     let par=null;
     for(const x of ord){
       const px=prev[x.id];if(!px)continue;
-      // se x subiu mas ficou EMPATADO (mesma qtd E mesmo recebimento) com outro, nao conta como ultrapassagem
-      const xEmpatado=ord.some(o=>o.id!==x.id&&o.qtd===x.qtd&&o.rec===x.rec);
-      if(xEmpatado)continue;
       for(const y of ord){
         if(y.id===x.id)continue;
         const py=prev[y.id];if(!py)continue;
