@@ -421,13 +421,13 @@ function slideEquipes(){
   // total GERAL (qtdGeral + recGeral) de todos os vendedores de cada equipe
   const arr=equipes.map(e=>{let qtd=0,rec=0;vendedores.forEach(v=>{if(v.equipeId===e.id){qtd+=Number(v.qtdGeral)||0;rec+=Number(v.recGeral)||0;}});return {e,qtd,rec};});
   const maxQ=Math.max(1,...arr.map(a=>a.qtd));const ord=[...arr].sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
-  return '<div class="ranking">'+ord.map((a,i)=>`<div class="linha" style="flex-direction:column;align-items:stretch;gap:.7vh">
+  return '<div class="ranking">'+ord.map((a,i)=>{const slug=(a.e.nome||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');return `<div class="linha eqbox${slug?' time-'+slug:''}" style="flex-direction:column;align-items:stretch;justify-content:center;gap:.7vh;min-height:11vh">
     <div style="display:flex;align-items:center;gap:1vw">
       <div class="pos" style="width:auto">${i+1}º</div>
       <div class="nm" style="color:${a.e.cor};flex:1;font-size:2.3vh">${a.e.nome}</div>
       <div style="text-align:right;font-size:1.7vh;font-weight:700"><span style="color:var(--gold)">${a.qtd}</span> matr. · <span style="${a.rec>0?'color:var(--green)':'color:var(--muted)'}">${fmtBRL(a.rec)}</span></div>
     </div>
-    <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`).join('')+'</div>';
+    <div class="barra" style="flex:none;height:1.4vh"><i style="width:${a.qtd/maxQ*100}%;background:${a.e.cor}"></i></div></div>`;}).join('')+'</div>';
 }
 // Geral: quantidade geral de matriculas, lancada MANUALMENTE no painel (campo qtdGeral). So exibicao — NAO entra na meta do dia.
 function slideDiasAnteriores(){
