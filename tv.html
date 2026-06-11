@@ -498,8 +498,9 @@ let ultraTimer=null;
 function currentOrder(){const {porVend}=stats();return Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec||a.lastDt-b.lastDt).map(a=>({id:a.v.id,qtd:a.qtd,rec:a.rec}));}
 // x esta ESTRITAMENTE a frente de y: mais matriculas, ou empate em matriculas com mais recebimento.
 function ultraMelhor(a,b){return a.qtd>b.qtd||(a.qtd===b.qtd&&a.rec>b.rec);}
-// A ultrapassagem so aparece quando DESEMPATA: x e y estavam empatados em matriculas (e x nao estava a frente)
-// e agora x ficou estritamente a frente. So entre os dois que estavam empatados (nada de pular do nada).
+// A ultrapassagem dispara quando x sai de "nao estava a frente de y" (atras ou empatado) para "esta a frente".
+// Vale tanto quem empatou e passou (recebimento/matricula) quanto quem estava atras, alcancou e passou.
+// Empate puro (ficou empatado, sem ficar a frente) NAO dispara.
 function checarUltra(){
   const ord=currentOrder();
   // so dispara depois que o painel abriu E os dados assentaram (ultraPronto); ate la so atualiza a base
@@ -511,8 +512,8 @@ function checarUltra(){
       for(const y of ord){
         if(y.id===x.id)continue;
         const py=prev[y.id];if(!py)continue;
-        // antes: empatados em matriculas e x NAO estava a frente | agora: x desempatou e esta a frente
-        if(px.qtd===py.qtd&&!ultraMelhor(px,py)&&ultraMelhor(x,y)){par={X:x.id,Y:y.id};break;}
+        // antes: x NAO estava a frente de y | agora: x esta estritamente a frente
+        if(!ultraMelhor(px,py)&&ultraMelhor(x,y)){par={X:x.id,Y:y.id};break;}
       }
       if(par)break;
     }
