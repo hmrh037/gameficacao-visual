@@ -37,11 +37,11 @@
   /* PÓDIO TOP 3 */
   .podio{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:end;gap:1.4vw;padding:1.1vh 6vw 0;}
   .pod{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;position:relative;isolation:isolate;}
-  /* numero da colocacao com o efeito de borda dos top 3 da tabela (cor da posicao) */
-  .pod-rank{position:absolute;top:3.2vh;left:.4vw;font-size:5.2vh;font-weight:900;line-height:1;color:var(--pc,#888);text-shadow:0 .3vh 1vh rgba(0,0,0,.7);z-index:5;pointer-events:none;padding:.1vh .9vw .3vh;border-radius:1.3vh;border:.28vh solid var(--border);background:rgba(0,0,0,.2);}
-  .pod-1 .pod-rank{font-size:7vh;top:3.6vh;border-color:rgba(212,175,55,.6);background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(212,175,55,.04));}
-  .pod-2 .pod-rank{border-color:rgba(203,213,225,.6);background:linear-gradient(135deg,rgba(203,213,225,.18),rgba(203,213,225,.04));}
-  .pod-3 .pod-rank{border-color:rgba(205,127,50,.6);background:linear-gradient(135deg,rgba(205,127,50,.18),rgba(205,127,50,.04));}
+  /* cortina de luz retangular atras de cada posicao: do topo ate encostar no pedestal, na cor da posicao (--pc) */
+  .pod::before{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:60%;height:100%;background:linear-gradient(180deg,var(--pc,#fff) 0%,transparent 90%);opacity:.32;filter:blur(15px);pointer-events:none;z-index:-1;}
+  .pod-1::before{opacity:.4;width:64%;}
+  .pod-rank{position:absolute;top:3.5vh;left:.4vw;font-size:5.5vh;font-weight:900;line-height:1;color:var(--pc,#888);text-shadow:0 .4vh 1.2vh rgba(0,0,0,.7),0 0 2vh var(--pc,#000);z-index:5;pointer-events:none;}
+  .pod-1 .pod-rank{font-size:7.5vh;top:4vh;}
   .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;display:flex;align-items:center;justify-content:center;visibility:hidden;}
   .medal-pod{width:6vh;height:6vh;object-fit:cover;border-radius:50%;font-size:2.4vh;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
   .pod-1 .medal-pod{width:7.5vh;height:7.5vh;}
