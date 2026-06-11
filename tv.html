@@ -64,8 +64,9 @@
   .pod-2 .pedestal{min-height:11vh;background:linear-gradient(180deg,rgba(203,213,225,.16),var(--card));}
   .pod-3 .pedestal{min-height:9vh;background:linear-gradient(180deg,rgba(205,127,50,.16),var(--card));}
   /* fundo tematico do time no pedestal (vem depois dos pod-N p/ sobrepor) */
-  .pedestal.time-atlas{background:linear-gradient(180deg,rgba(8,6,14,.4),rgba(8,6,14,.68)),url('imagens/atlas-bg.png') center/cover no-repeat;border-top-color:rgba(190,150,70,.7);}
-  .pedestal.time-cuiudas{background:linear-gradient(180deg,rgba(8,6,14,.4),rgba(8,6,14,.68)),url('imagens/cuiudas.png') center/cover no-repeat;border-top-color:rgba(190,150,70,.7);}
+  .pedestal.time-atlas,.pedestal.time-cuiudas{position:relative;isolation:isolate;background:#15111f;}
+  .pedestal.time-atlas::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(180deg,rgba(8,6,14,.4),rgba(8,6,14,.68)),url('imagens/atlas-bg.png') center/cover no-repeat;filter:blur(3px);}
+  .pedestal.time-cuiudas::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(180deg,rgba(8,6,14,.4),rgba(8,6,14,.68)),url('imagens/cuiudas.png') center/cover no-repeat;filter:blur(3px);}
   .pod-vazio{opacity:.3;}
   .pod-vazio .pedestal{min-height:9vh;}
 
