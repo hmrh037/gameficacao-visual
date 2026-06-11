@@ -49,7 +49,7 @@
   .pod-av img{width:100%;height:100%;object-fit:contain;}
   .pod-nm{font-weight:800;font-size:2.3vh;margin-top:1vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .pod-eq{font-size:1.55vh;font-weight:700;text-transform:uppercase;}
-  .pedestal{margin-top:1vh;width:100%;background:linear-gradient(180deg,#221a3a,var(--card));border:1px solid rgba(190,150,70,.5);border-radius:1.2vh 1.2vh 0 0;padding:1vh .6vw .8vh;display:flex;flex-direction:column;align-items:center;gap:.2vh;}
+  .pedestal{margin-top:1vh;width:100%;background:linear-gradient(180deg,#221a3a,var(--card));border:none;border-radius:1.2vh 1.2vh 0 0;padding:1vh .6vw .8vh;display:flex;flex-direction:column;align-items:center;gap:.2vh;}
   .pedestal.sem-rec{justify-content:center;}
   .pod-pos{font-size:1.6vh;font-weight:900;color:var(--pc,#888);letter-spacing:1px;}
   .pod-pts{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:3.4vh;font-weight:900;line-height:1;}
@@ -98,7 +98,7 @@
   .ranking .trow.pod2 .t-rank{color:#cbd5e1;}
   .ranking .trow.pod3 .t-rank{color:#cd7f32;}
   /* fundo tematico por time (vem depois dos pod p/ sobrepor o gradiente) */
-  .ranking .trow.time-atlas,.ranking .trow.time-cuiudas{position:relative;isolation:isolate;background:#14101e;border-color:rgba(190,150,70,.5);}
+  .ranking .trow.time-atlas,.ranking .trow.time-cuiudas{position:relative;isolation:isolate;background:#14101e;border-color:transparent;}
   .ranking .trow.time-atlas::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(90deg,rgba(8,6,14,.8) 0%,rgba(8,6,14,.45) 35%,rgba(8,6,14,.22) 100%),url('imagens/atlas-bg.png') center 40%/cover no-repeat;filter:blur(2.5px);pointer-events:none;}
   .ranking .trow.time-cuiudas::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(90deg,rgba(8,6,14,.8) 0%,rgba(8,6,14,.45) 35%,rgba(8,6,14,.22) 100%),url('imagens/cuiudas.png') center 68%/cover no-repeat;filter:blur(2.5px);pointer-events:none;}
   .t-vend{display:flex;align-items:center;gap:.8vw;min-width:0;}
