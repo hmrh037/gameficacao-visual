@@ -362,9 +362,9 @@ const fotoEl=v=>v&&v.foto?`<img class="foto" src="${v.foto}"/>`:`<div class="fot
 
 function stats(){
   const mats=matriculas.filter(noPeriodo);const recs=recebimentos.filter(noPeriodo);const porVend={},porEq={};
-  vendedores.forEach(v=>porVend[v.id]={v,qtd:0,valor:0,rec:0,recQtd:0});
+  vendedores.forEach(v=>porVend[v.id]={v,qtd:0,valor:0,rec:0,recQtd:0,lastDt:0});
   equipes.forEach(e=>porEq[e.id]={e,qtd:0,valor:0,rec:0,recQtd:0});
-  mats.forEach(m=>{if(porVend[m.vendedorId]){porVend[m.vendedorId].qtd++;porVend[m.vendedorId].valor+=Number(m.valor)||0;}const v=getVend(m.vendedorId);if(v&&porEq[v.equipeId]){porEq[v.equipeId].qtd++;porEq[v.equipeId].valor+=Number(m.valor)||0;}});
+  mats.forEach(m=>{if(porVend[m.vendedorId]){porVend[m.vendedorId].qtd++;porVend[m.vendedorId].valor+=Number(m.valor)||0;const dt=Number(m.dt)||0;if(dt>porVend[m.vendedorId].lastDt)porVend[m.vendedorId].lastDt=dt;}const v=getVend(m.vendedorId);if(v&&porEq[v.equipeId]){porEq[v.equipeId].qtd++;porEq[v.equipeId].valor+=Number(m.valor)||0;}});
   recs.forEach(r=>{if(porVend[r.vendedorId]){porVend[r.vendedorId].rec+=Number(r.valor)||0;porVend[r.vendedorId].recQtd++;}const v=getVend(r.vendedorId);if(v&&porEq[v.equipeId]){porEq[v.equipeId].rec+=Number(r.valor)||0;porEq[v.equipeId].recQtd++;}});
   return {porVend,porEq};
 }
@@ -373,7 +373,7 @@ function iniciais(n){return (n||'').trim().split(/\s+/).map(p=>p[0]||'').slice(0
 // cor da barra pela qtd de matriculas: amarelo (1-2) -> azul (3-4) -> verde (5+)
 function corBarra(q){return q<=2?'#f1c40f':q<=4?'#3b82f6':'#00d084';}
 function renderRanking(){
-  const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
+  const {porVend}=stats();let arr=Object.values(porVend).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec||a.lastDt-b.lastDt);
   const el=document.getElementById('ranking');
   // o top 3 (com resultado) fica SO no podium -> nao aparece na tabela; a tabela comeca no 4o lugar
   const comRes=arr.filter(a=>a.qtd>0);
@@ -467,7 +467,7 @@ function renderSlide(){
 function proximoSlide(){slideIdx=(slideIdx+1)%SLIDES.length;renderSlide();}
 function renderPodio(){
   const {porVend}=stats();
-  const arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec);
+  const arr=Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec||a.lastDt-b.lastDt);
   const cont=document.getElementById('podio');if(!cont)return;
   if(!arr.length){cont.innerHTML='<div class="vazio" style="width:100%">Aguardando resultados...</div>';return;}
   const med={1:'🥇',2:'🥈',3:'🥉'},cor={1:'#d4af37',2:'#cbd5e1',3:'#cd7f32'};
@@ -495,7 +495,7 @@ function renderPainel(){renderPodio();renderRanking();renderSlide();renderTotalD
 
 // ---- ultrapassagem no ranking ----
 let ultraTimer=null;
-function currentOrder(){const {porVend}=stats();return Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec).map(a=>({id:a.v.id,qtd:a.qtd,rec:a.rec}));}
+function currentOrder(){const {porVend}=stats();return Object.values(porVend).filter(a=>a.qtd>0).sort((a,b)=>b.qtd-a.qtd||b.rec-a.rec||a.lastDt-b.lastDt).map(a=>({id:a.v.id,qtd:a.qtd,rec:a.rec}));}
 // x esta ESTRITAMENTE a frente de y: mais matriculas, ou empate em matriculas com mais recebimento.
 function ultraMelhor(a,b){return a.qtd>b.qtd||(a.qtd===b.qtd&&a.rec>b.rec);}
 // A ultrapassagem so aparece quando DESEMPATA: x e y estavam empatados em matriculas (e x nao estava a frente)
