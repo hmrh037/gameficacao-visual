@@ -42,13 +42,12 @@
   .pod-1::before{opacity:.4;width:64%;}
   .pod-rank{position:absolute;top:3.5vh;left:.4vw;font-size:5.5vh;font-weight:900;line-height:1;color:var(--pc,#888);text-shadow:0 .4vh 1.2vh rgba(0,0,0,.7),0 0 2vh var(--pc,#000);z-index:5;pointer-events:none;}
   .pod-1 .pod-rank{font-size:7.5vh;top:4vh;}
-  /* tier (liga) centralizado na BASE do avatar, atravessando a borda (metade dentro, metade fora) */
-  .pod-med{position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);z-index:6;display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none;}
-  .medal-pod{width:5vh;height:5vh;object-fit:cover;border-radius:50%;font-size:2.4vh;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));}
-  .pod-1 .medal-pod{width:6vh;height:6vh;}
-  .pod-av{width:13vh;height:13vh;display:flex;align-items:center;justify-content:center;font-size:7vh;background:transparent;position:relative;}
-  .pod-av img{width:100%;height:100%;object-fit:contain;transform:scale(2);transform-origin:center bottom;}
-  .pod-nm{font-weight:800;font-size:2.3vh;margin-top:3.2vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .pod-med{font-size:3vh;line-height:1;margin-bottom:.3vh;display:flex;align-items:center;justify-content:center;visibility:hidden;}
+  .medal-pod{width:6vh;height:6vh;object-fit:cover;border-radius:50%;font-size:2.4vh;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
+  .pod-1 .medal-pod{width:7.5vh;height:7.5vh;}
+  .pod-av{width:13vh;height:13vh;display:flex;align-items:center;justify-content:center;font-size:7vh;background:transparent;transform:scale(2);transform-origin:center bottom;}
+  .pod-av img{width:100%;height:100%;object-fit:contain;}
+  .pod-nm{font-weight:800;font-size:2.3vh;margin-top:.8vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .pod-eq{font-size:1.55vh;font-weight:700;text-transform:uppercase;}
   .pedestal{margin-top:1vh;width:100%;background:linear-gradient(180deg,#221a3a,var(--card));border:1px solid var(--border);border-top:.4vh solid var(--pc,#888);border-radius:1.2vh 1.2vh 0 0;padding:1vh .6vw .8vh;display:flex;flex-direction:column;align-items:center;gap:.2vh;}
   .pedestal.sem-rec{justify-content:center;}
@@ -480,7 +479,8 @@ function renderPodio(){
     const foto=a.v.foto?`<img src="${a.v.foto}"/>`:'🧑';
     return `<div class="pod pod-${pos}" style="--pc:${cor[pos]}">
       <div class="pod-rank">${pos}º</div>
-      <div class="pod-av">${foto}<div class="pod-med">${medalHTML(a.qtd,'medal-pod')||med[pos]}</div></div>
+      <div class="pod-med">${medalHTML(a.qtd,'medal-pod')||med[pos]}</div>
+      <div class="pod-av">${foto}</div>
       <div class="pod-nm">${a.v.nome}</div>
       <div class="pod-eq" style="color:${eq.cor}">${eq.nome}</div>
       <div class="pedestal${a.rec>0?'':' sem-rec'}${slug?' time-'+slug:''}">
