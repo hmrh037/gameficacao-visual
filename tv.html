@@ -291,6 +291,7 @@ const SOM_ULTRA="ultrapassagem.mpeg";
 const SOM_GRILO="grilo.mp3";
 const SOM_DINHEIRO="money.mp3";
 const SOM_MATRICULA="matricula.mp3";
+const SOM_PRIMEIRO="primeiro%2B1.mpeg"; // som especial quando o 1o colocado faz matricula (arquivo: primeiro+1.mpeg)
 const FORMA_ICON={'Cartão':'💳','À vista':'💵','Boleto':'🧾','PIX':'⚡'};
 // Ligas (tiers) pelo TOTAL GERAL de matriculas — do mais fraco ao mais forte
 const TIERS=[
@@ -310,7 +311,7 @@ let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=tr
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,ultraPronto=false,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,volComemoracao:100,periodo:'hoje'};
+let prevOrder=null,ultraPronto=false,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,somPrimeiro=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,volComemoracao:100,periodo:'hoje'};
 let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
 let lastGriloTs=0,primeiroGrilo=true;
 
@@ -556,7 +557,10 @@ function celebrar(vendedorId){
     <div class="foto-m">${v.foto?`<img src="${v.foto}"/>`:'🦸'}</div>
     <div class="titulo">⚡ NOVA MATRÍCULA! ⚡</div><div class="nome">${v.nome}</div>
     <div class="eqnome" style="color:${eq.cor}">🛡️ ${eq.nome}</div></div>`;
-  soltarBaloes(eq.cor);soltarConfete();if(marco)soltarConfete();tocarMatricula();
+  soltarBaloes(eq.cor);soltarConfete();if(marco)soltarConfete();
+  // se quem fez a matricula e o 1o colocado, toca o som especial; senao, o normal
+  const ord=currentOrder();const ehPrimeiro=ord.length>0&&ord[0].id===vendedorId;
+  if(ehPrimeiro)tocarPrimeiro();else tocarMatricula();
   clearTimeout(celebTimer);celebTimer=setTimeout(()=>cel.classList.add('hidden'),(config.tempoCeleb||8)*1000);
   cel.onclick=()=>cel.classList.add('hidden');
 }
@@ -573,6 +577,16 @@ function tocarMatricula(){
     const p=somMatricula.play();
     if(p&&p.catch)p.catch(()=>tocarFanfarra()); // se faltar o arquivo matricula.mp3, usa a fanfarra sintetizada
   }catch(e){tocarFanfarra();}
+}
+function tocarPrimeiro(){ // som especial do 1o colocado; se faltar o arquivo, cai no som normal de matricula
+  if(!som)return;
+  try{
+    if(!somPrimeiro)somPrimeiro=new Audio(SOM_PRIMEIRO);
+    somPrimeiro.volume=volCom();
+    somPrimeiro.currentTime=0;
+    const p=somPrimeiro.play();
+    if(p&&p.catch)p.catch(()=>tocarMatricula());
+  }catch(e){tocarMatricula();}
 }
 
 // ---- comemoracao de RECEBIMENTO (formato proprio: dinheiro) ----
@@ -615,6 +629,7 @@ function aplicarVolumes(){
   if(somGrilo)somGrilo.volume=vc;
   if(somDinheiro)somDinheiro.volume=vc;
   if(somMatricula)somMatricula.volume=vc;
+  if(somPrimeiro)somPrimeiro.volume=vc;
 }
 
 // ---- inatividade (grilo) ----
