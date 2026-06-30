@@ -98,10 +98,9 @@
     <div class="row">
       <div class="fld"><label>Tempo da comemoração (segundos)</label><input id="cfgTempo" type="number" min="2" max="60" step="1" onchange="setTempoCeleb(this.value)"/></div>
       <div class="fld"><label>Valor da matrícula (R$)</label><input id="cfgValor" type="number" min="0" step="0.01" placeholder="0,00" onchange="setValorMat(this.value)"/></div>
-      <div class="fld"><label>Alerta de inatividade (minutos)</label><input id="cfgInativ" type="number" min="0" max="240" step="1" placeholder="0 = desligado" onchange="setInatividade(this.value)"/></div>
       <div class="fld"><label>Período exibido nas TVs</label><select id="cfgPeriodo" onchange="setPeriodo(this.value)"><option value="hoje">Hoje</option><option value="mes">Mês</option><option value="tudo">Geral</option></select></div>
     </div>
-    <div class="hint" style="margin-top:6px">Tempo da comemoração nas TVs · Valor padrão somado a cada matrícula lançada · Inatividade: após X minutos sem vendas, as TVs tocam o 🦗 grilo (0 desliga).</div>
+    <div class="hint" style="margin-top:6px">Tempo da comemoração nas TVs · Valor padrão somado a cada matrícula lançada.</div>
   </div>
 
   <div class="acard">
@@ -152,11 +151,10 @@
 <script>
 const uid=()=>Date.now()+Math.floor(Math.random()*100000);
 let equipes=[{id:1,nome:"Equipe Alpha",cor:"#2563eb",meta:0},{id:2,nome:"Equipe Omega",cor:"#ef4444",meta:0}];
-let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,periodo:'hoje'};
+let vendedores=[],matriculas=[],recebimentos=[],config={tempoCeleb:8,valorMatricula:0,periodo:'hoje'};
 let db=null,pronto=false;
 function setTempoCeleb(v){config.tempoCeleb=Math.max(2,Math.min(60,parseInt(v)||8));salvarConfig();}
 function setValorMat(v){v=String(v).trim();if(v.indexOf(',')>-1)v=v.replace(/\./g,'').replace(',','.');config.valorMatricula=Math.max(0,parseFloat(v)||0);salvarConfig();}
-function setInatividade(v){config.inatividadeMin=Math.max(0,parseInt(v)||0);salvarConfig();}
 function setPeriodo(v){config.periodo=v||'hoje';salvarConfig();}
 
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
@@ -257,7 +255,6 @@ function renderAdmin(){
   const lr=document.getElementById('listaReceb');if(lr)lr.innerHTML=rs.length?rs.map(r=>{const v=getVend(r.vendedorId);return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1">${v?v.nome:'(removido)'} — <b style="color:var(--green)">${fmtBRL(r.valor)}</b> <span class="chip" style="background:#22c55e22;color:#86efac">${r.forma||'—'}</span> — ${new Date(r.dt).toLocaleString('pt-BR')}</span><button class="btn red" style="padding:4px 10px" onclick="delRecebimento(${r.id})">✕</button></div>`;}).join(''):'<div class="hint">Nenhum recebimento lançado ainda.</div>';
   const ct=document.getElementById('cfgTempo');if(ct)ct.value=config.tempoCeleb||8;
   const cv=document.getElementById('cfgValor');if(cv&&document.activeElement!==cv)cv.value=config.valorMatricula||0;
-  const ci=document.getElementById('cfgInativ');if(ci&&document.activeElement!==ci)ci.value=config.inatividadeMin||0;
   const cpd=document.getElementById('cfgPeriodo');if(cpd&&document.activeElement!==cpd)cpd.value=config.periodo||'hoje';
 }
 function editEquipe(id,campo,val){const e=getEq(id);if(e){e[campo]=(campo==='meta')?Math.max(0,parseInt(val)||0):val;salvarEquipes();renderAdmin();}}

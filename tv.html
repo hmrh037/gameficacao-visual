@@ -229,11 +229,6 @@
   .destaque{animation:piscaLinha .55s ease-in-out 7;position:relative;z-index:2;}
   @keyframes piscaLinha{0%,100%{box-shadow:0 0 0 transparent;transform:scale(1);border-color:transparent;}50%{background:rgba(212,175,55,.18);box-shadow:0 0 28px var(--gold);transform:scale(1.02);border-color:var(--gold);}}
   .conquista{margin-top:1.4vh;display:inline-block;background:linear-gradient(90deg,#d4af37,#f1c40f);color:#1a1300;font-size:2.6vh;font-weight:900;padding:1vh 2.4vw;border-radius:999px;box-shadow:0 8px 30px rgba(212,175,55,.4);animation:treme .5s ease-in-out 3;}
-  #grilo{position:fixed;inset:0;z-index:340;display:flex;align-items:center;justify-content:center;background:rgba(3,6,20,.6);backdrop-filter:blur(2px);}
-  #grilo .grilo-box{text-align:center;animation:entra .5s cubic-bezier(.2,1.4,.4,1);}
-  #grilo .grilo-emoji{font-size:18vh;animation:pulsa 1.2s ease-in-out infinite;}
-  #grilo .grilo-t{font-size:4.5vh;font-weight:900;color:var(--gold);margin-top:1vh;}
-  #grilo .grilo-s{font-size:3vh;font-weight:800;color:var(--text);margin-top:.6vh;}
   #recebe{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, rgba(6,40,18,.92), rgba(2,12,6,.94));backdrop-filter:blur(4px);overflow:hidden;}
   #recebe .moeda-bg{position:absolute;width:160vh;height:160vh;background:repeating-conic-gradient(from 0deg,var(--green) 0deg 9deg,transparent 9deg 18deg);opacity:.15;animation:girar 9s linear infinite;}
   .heroi-r{position:relative;text-align:center;}
@@ -281,14 +276,12 @@
 <div id="celebra" class="hidden"></div>
 <div id="recebe" class="hidden"></div>
 <div id="ultra" class="hidden"></div>
-<div id="grilo" class="hidden"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
 const SHIELD_IMG="exemplo.webp";
 const SOM_ULTRA="ultrapassagem.mpeg";
-const SOM_GRILO="grilo.mp3";
 const SOM_DINHEIRO="money.mp3";
 const SOM_MATRICULA="matricula.mp3";
 const SOM_PRIMEIRO="primeiro%2B1.mpeg"; // som especial quando o 1o colocado faz matricula (arquivo: primeiro+1.mpeg)
@@ -311,9 +304,8 @@ let equipes=[],vendedores=[],matriculas=[],recebimentos=[],periodo='hoje',som=tr
 let lastRecebeTs=0,primeiroRecebe=true,recebeTimer=null;
 let db=null,lastCelebTs=0,primeiraCeleb=true;
 let lastTesteTs=0,primeiraTeste=true;
-let prevOrder=null,ultraPronto=false,somUltra=null,somGrilo=null,somDinheiro=null,somMatricula=null,somPrimeiro=null,config={tempoCeleb:8,valorMatricula:0,inatividadeMin:0,volComemoracao:100,periodo:'hoje'};
-let ultimaAtividade=Date.now(),griloMostrado=false,painelAtivo=false;
-let lastGriloTs=0,primeiroGrilo=true;
+let prevOrder=null,ultraPronto=false,somUltra=null,somDinheiro=null,somMatricula=null,somPrimeiro=null,config={tempoCeleb:8,valorMatricula:0,volComemoracao:100,periodo:'hoje'};
+let painelAtivo=false;
 
 // ---- Firebase ----
 function cfgValida(){const c=window.FIREBASE_CONFIG||{};return c.apiKey&&c.apiKey.indexOf('COLE_AQUI')<0&&c.databaseURL&&c.databaseURL.indexOf('SEU-PROJETO')<0;}
@@ -341,11 +333,6 @@ function conectar(){
     const t=snap.val(); if(!t||!t.ts) return;
     if(primeiraTeste){primeiraTeste=false;lastTesteTs=t.ts;return;}
     if(t.ts!==lastTesteTs){lastTesteTs=t.ts; mostrarUltrapassagem(t.xId,t.yId);}
-  });
-  db.ref('painel/grilo').on('value',snap=>{
-    const g=snap.val(); if(!g||!g.ts) return;
-    if(primeiroGrilo){primeiroGrilo=false;lastGriloTs=g.ts;return;}
-    if(g.ts!==lastGriloTs){lastGriloTs=g.ts; mostrarGrilo();}
   });
   db.ref('painel/recebe').on('value',snap=>{
     const c=snap.val(); if(!c||!c.ts) return;
@@ -548,7 +535,6 @@ function mostrarUltrapassagem(xId,yId){
 // ---- celebracao ----
 let celebTimer=null;
 function celebrar(vendedorId){
-  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();
   const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#d4af37'};
   const qtdHoje=matriculas.filter(m=>m.vendedorId===vendedorId&&m.data===hojeStr()).length;
   const marco=(qtdHoje>=5&&qtdHoje%5===0);
@@ -591,7 +577,6 @@ function tocarPrimeiro(){ // som especial do 1o colocado; se faltar o arquivo, c
 
 // ---- comemoracao de RECEBIMENTO (formato proprio: dinheiro) ----
 function celebrarRecebimento(vendedorId,valor,forma){
-  ultimaAtividade=Date.now();griloMostrado=false;esconderGrilo();
   const v=getVend(vendedorId);if(!v)return;const eq=getEq(v.equipeId)||{nome:'',cor:'#00d084'};
   const fic=FORMA_ICON[forma]||'💳';
   const cel=document.getElementById('recebe');cel.classList.remove('hidden');
@@ -626,30 +611,12 @@ function volCom(){return Math.max(0,Math.min(1,(config.volComemoracao==null?100:
 function aplicarVolumes(){
   const vc=volCom();
   if(somUltra)somUltra.volume=vc;
-  if(somGrilo)somGrilo.volume=vc;
   if(somDinheiro)somDinheiro.volume=vc;
   if(somMatricula)somMatricula.volume=vc;
   if(somPrimeiro)somPrimeiro.volume=vc;
 }
 
-// ---- inatividade (grilo) ----
-let griloTimer=null;
-function tocarSomGrilo(){if(!som)return;try{if(!somGrilo)somGrilo=new Audio(SOM_GRILO);somGrilo.volume=volCom();somGrilo.currentTime=0;somGrilo.play().catch(()=>{});}catch(e){}}
-function mostrarGrilo(){
-  const g=document.getElementById('grilo');g.classList.remove('hidden');
-  g.innerHTML=`<div class="grilo-box"><div class="grilo-emoji">🦗</div><div class="grilo-t">Tá muito quieto por aqui...</div><div class="grilo-s">Bora vender! 🚀</div></div>`;
-  tocarSomGrilo();
-  clearTimeout(griloTimer);griloTimer=setTimeout(esconderGrilo,7000);
-}
-function esconderGrilo(){const g=document.getElementById('grilo');if(g){g.classList.add('hidden');g.innerHTML='';}}
-function checarInatividade(){
-  if(!painelAtivo||griloMostrado)return;
-  const min=Number(config.inatividadeMin)||0;if(min<=0)return;
-  if(Date.now()-ultimaAtividade>=min*60000){griloMostrado=true;mostrarGrilo();}
-}
-setInterval(checarInatividade,20000);
-
-function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;ultimaAtividade=Date.now();try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();
+function iniciarPainel(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}document.getElementById('iniciar').classList.add('hidden');document.getElementById('painel').classList.remove('hidden');painelAtivo=true;try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}catch(e){}renderPainel();
   // so habilita a ultrapassagem depois que os dados do Firebase pararem de chegar (evita falso positivo no F5/carregamento)
   ultraPronto=false;agendarUltraPronto();}
 // ---- rodizio de slides: o slide "Geral" ganha tempo extra e roda a mesma
